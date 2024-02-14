@@ -34,7 +34,7 @@ class AppStore extends GetxController {
       textSecondaryColor.value = Colors.white54;
     } else {
       scaffoldBackground.value = whiteColor;
-      appBarColor.value = primaryColor;
+      appBarColor.value = appColorPrimary;
       backgroundColor.value = Colors.black;
       backgroundSecondaryColor.value = appSecondaryBackgroundColor;
       appColorPrimaryLightColor.value = appColorPrimaryLight;

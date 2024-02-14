@@ -291,6 +291,7 @@ class _HomeFragmentState extends State<HomeFragment> {
               child: Column(
                 children: [
                   GridView.count(
+                    physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     crossAxisCount: 3,
                     children: List.generate(6, (index) {

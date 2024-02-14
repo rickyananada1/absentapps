@@ -1,5 +1,5 @@
 import 'package:get_it/get_it.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 import '../data/datasource/remote/api_provider.dart';
 import 'network_info.dart';

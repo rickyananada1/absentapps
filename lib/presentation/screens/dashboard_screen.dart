@@ -17,7 +17,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   final List<Widget> _fragments = [
     const HomeFragment(),
+    const Scaffold(),
     const ActivityFragment(),
+    const Scaffold(),
+    const Scaffold(),
   ];
 
   void _onItemTapped(int index) {
@@ -34,22 +37,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
+              icon: Icon(Icons.home_outlined, color: Colors.grey),
               label: 'Beranda',
+              activeIcon: Icon(Icons.home_outlined, color: appColorPrimary),
             ),
             BottomNavigationBarItem(
-              icon: Icon(FontAwesomeIcons.clock),
+              icon: Icon(Icons.alarm_outlined, color: Colors.grey),
               label: 'Jadwal',
+              activeIcon: Icon(Icons.alarm_outlined, color: appColorPrimary),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today_outlined),
+              icon: Icon(Icons.calendar_month_outlined, color: Colors.grey),
               label: 'Aktivitas',
+              activeIcon:
+                  Icon(Icons.calendar_month_outlined, color: appColorPrimary),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.notifications_outlined, color: Colors.grey),
+              label: 'Notifikasi',
+              activeIcon:
+                  Icon(Icons.notifications_outlined, color: appColorPrimary),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline, color: Colors.grey),
+              label: 'Profil',
+              activeIcon: Icon(FontAwesomeIcons.user, color: appColorPrimary),
             ),
           ],
           currentIndex: _selectedIndex,
           selectedItemColor: appColorPrimary,
           onTap: _onItemTapped,
-          elevation: 12,
+          showUnselectedLabels: true,
+          unselectedItemColor: Colors.grey,
+          // type: BottomNavigationBarType.fixed,
         ),
       ),
     );

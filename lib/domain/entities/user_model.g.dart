@@ -3,34 +3,69 @@
 part of 'user_model.dart';
 
 // **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
+
+class UserAdapter extends TypeAdapter<_$UserImpl> {
+  @override
+  final int typeId = 0;
+
+  @override
+  _$UserImpl read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return _$UserImpl(
+      id: fields[0] as int?,
+      username: fields[1] as String?,
+      embeddings: (fields[2] as List?)?.cast<double>(),
+      distance: fields[3] as double?,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, _$UserImpl obj) {
+    writer
+      ..writeByte(4)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.username)
+      ..writeByte(3)
+      ..write(obj.distance)
+      ..writeByte(2)
+      ..write(obj.embeddings);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UserAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+// **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
 _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
-      username: json['username'] as String,
-      name: json['name'] as String,
-      no_hp: json['no_hp'] as String,
-      email: json['email'] as String,
-      jenis: json['jenis'] as String,
-      periode_bulan: json['periode_bulan'] as String,
-      periode_bulan_name: json['periode_bulan_name'] as String,
-      periode_tahun: json['periode_tahun'] as String,
-      total_pelanggan: json['total_pelanggan'] as int,
-      tercatat: json['tercatat'] as int,
-      persentase: (json['persentase'] as num).toDouble(),
+      id: json['id'] as int?,
+      username: json['username'] as String?,
+      embeddings: (json['embeddings'] as List<dynamic>?)
+          ?.map((e) => (e as num).toDouble())
+          .toList(),
+      distance: (json['distance'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'username': instance.username,
-      'name': instance.name,
-      'no_hp': instance.no_hp,
-      'email': instance.email,
-      'jenis': instance.jenis,
-      'periode_bulan': instance.periode_bulan,
-      'periode_bulan_name': instance.periode_bulan_name,
-      'periode_tahun': instance.periode_tahun,
-      'total_pelanggan': instance.total_pelanggan,
-      'tercatat': instance.tercatat,
-      'persentase': instance.persentase,
+      'embeddings': instance.embeddings,
+      'distance': instance.distance,
     };

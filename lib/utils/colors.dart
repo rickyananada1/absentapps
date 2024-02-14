@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 
-var primaryColor = const Color.fromARGB(255, 14, 152, 231);
-
 // Dark Theme Colors
 const appBackgroundColorDark = Color(0xFF121212);
 const cardBackgroundBlackDark = Color(0xFF1F1F1F);
-const color_primary_black = Color(0xFF131d25);
+const colorPrimaryBlack = Color(0xFF131d25);
 const appColorPrimaryDarkLight = Color(0xFFF9FAFF);
 const iconColorPrimaryDark = Color(0xFF212121);
 const iconColorSecondaryDark = Color(0xFFA8ABAD);
 const appShadowColorDark = Color(0x1A3E3942);
-const appColorPrimary = Color(0xFF18978A);
+const appColorPrimary = Color(0xFFF1574D);
 const appSecondaryBackgroundColor = Color(0xfff4f7fc);
 const iconColorPrimary = Color(0xFFFFFFFF);
 const iconColorSecondary = Color(0xFFA8ABAD);
