@@ -1,3 +1,4 @@
+import 'package:absentapps/presentation/screens/on_boarding_screen.dart';
 import 'package:absentapps/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -31,8 +32,14 @@ class _SplashScreenState extends State<SplashScreen> {
       //     Navigator.pushReplacementNamed(context, '/login');
       //   }
       // });
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const OnBoardingScreen(),
+        ),
+      );
 
-      Navigator.pushReplacementNamed(context, '/login');
+      // Navigator.pushReplacementNamed(context, '/login');
     });
   }
 
