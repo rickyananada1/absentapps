@@ -1,11 +1,10 @@
 import 'package:absentapps/utils/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 import '../../domain/entities/user_model.dart';
 import '../../utils/local_db.dart';
-import 'face_scan_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -168,12 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
                               await _saveUser();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const FaceScanScreen(),
-                                ),
-                              );
+                              Get.offAllNamed('/face_scan');
                             }
                           },
                           style: ElevatedButton.styleFrom(

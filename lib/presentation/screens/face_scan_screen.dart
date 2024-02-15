@@ -5,10 +5,12 @@ import 'package:absentapps/utils/colors.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:lottie/lottie.dart';
 import 'package:image/image.dart' as img;
 import 'package:nb_utils/nb_utils.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../domain/entities/user_model.dart';
 import '../../services/ml_service.dart';
@@ -30,6 +32,22 @@ class _FaceScanScreenState extends State<FaceScanScreen> {
   late FaceDetector faceDetector;
   File? _image;
   late MLService mlService;
+
+  Future<void> requestPermissions() async {
+    await [
+      Permission.camera,
+      Permission.storage,
+      Permission.microphone,
+    ].request();
+
+    if (await Permission.camera.isGranted) {
+      log('Camera permission granted');
+    }
+
+    if (await Permission.storage.isGranted) {
+      log('Storage permission granted');
+    }
+  }
 
   Future initializeCamera() async {
     cameras = await availableCameras();
@@ -90,6 +108,7 @@ class _FaceScanScreenState extends State<FaceScanScreen> {
           bool isMatched = await mlService.compareFaces(cropedFace);
           if (isMatched) {
             toast("Face Matched");
+            Get.offNamed('/dashboard');
           } else {
             toast("Face Not Matched");
           }
@@ -134,11 +153,12 @@ class _FaceScanScreenState extends State<FaceScanScreen> {
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Face Registered"),
-                    ),
-                  );
+                  Get.showSnackbar(const GetSnackBar(
+                    title: "Face Registered",
+                    message: "Face Registered",
+                    duration: Duration(seconds: 2),
+                  ));
+                  Get.offNamed('/dashboard');
                 },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: appColorPrimary,
@@ -155,10 +175,9 @@ class _FaceScanScreenState extends State<FaceScanScreen> {
 
   @override
   void initState() {
+    requestPermissions();
     initializeCamera();
     final options = FaceDetectorOptions(
-      // enableContours: true,
-      // enableLandmarks: true,
       performanceMode: FaceDetectorMode.accurate,
     );
     faceDetector = FaceDetector(options: options);

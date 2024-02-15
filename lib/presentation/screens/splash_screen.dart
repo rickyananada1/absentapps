@@ -1,10 +1,12 @@
-import 'package:absentapps/presentation/screens/on_boarding_screen.dart';
-import 'package:absentapps/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 import '../../utils/local_db.dart';
 import 'face_scan_screen.dart';
+
+const String IS_FIRST_TIME = 'is_first_time';
+const String IS_USER = 'is_user';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -17,29 +19,26 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 3), () {
-      // check db
-      // LocalDb().getUser().then((user) {
-      //   if (user != null) {
-      //     toast('Welcome back, ${user.username}');
-      //     Navigator.push(
-      //       context,
-      //       MaterialPageRoute(
-      //         builder: (context) => const FaceScanScreen(),
-      //       ),
-      //     );
-      //   } else {
-      //     Navigator.pushReplacementNamed(context, '/login');
-      //   }
-      // });
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const OnBoardingScreen(),
-        ),
-      );
+    Future.delayed(const Duration(seconds: 3), () async {
+      var isBoarding = getIntAsync(IS_FIRST_TIME, defaultValue: 0);
+      if (isBoarding == 0) {
+        await setValue(IS_FIRST_TIME, 1);
+        Get.offAllNamed('/onboarding');
+      } else {
+        checkUser();
+      }
+    });
+  }
 
-      // Navigator.pushReplacementNamed(context, '/login');
+  void checkUser() {
+    // check db
+    LocalDb().getUser().then((user) {
+      if (user != null) {
+        toast('Welcome back, ${user.username}');
+        Get.offAll(const FaceScanScreen());
+      } else {
+        Get.offAllNamed('/login');
+      }
     });
   }
 

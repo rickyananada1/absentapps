@@ -70,10 +70,10 @@ class _HomeFragmentState extends State<HomeFragment> {
                     children: [
                       Row(
                         children: [
-                          Icon(
-                            Icons.rectangle_rounded,
-                            color: const Color.fromARGB(255, 234, 234, 234),
-                            size: MediaQuery.of(context).size.width * 0.15,
+                          Image.asset(
+                            'assets/images/logo.png',
+                            width: 50,
+                            height: 50,
                           ),
                           const SizedBox(width: 10.0),
                           Expanded(
