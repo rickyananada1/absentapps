@@ -1,10 +1,10 @@
 import 'package:absentapps/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:nb_utils/nb_utils.dart';
 
-import '../../domain/entities/user_model.dart';
-import '../../utils/local_db.dart';
+import '../controllers/auth_controller.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,192 +14,202 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final AuthController authController = Get.put(AuthController());
   late bool _passwordIsVisible = false;
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final FocusNode usernameFocus = FocusNode();
+  final FocusNode passwordFocus = FocusNode();
   final _formKey = GlobalKey<FormState>();
-
-  Future<void> _saveUser() async {
-    if (_usernameController.text.isNotEmpty &&
-        _passwordController.text.isNotEmpty) {
-      await LocalDb().saveUser(User(
-        username: _usernameController.text,
-      ));
-      toast('Berhasil Login');
-    } else {
-      toast('Username dan Password tidak boleh kosong');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Stack(
             children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Image(
-                      image: AssetImage('assets/images/astina.png'),
-                      height: 250,
-                      width: 250,
-                    ),
-                    Text(
-                      'Astina Absensi Online',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.left,
-                    ),
-                    Text(
-                      'Login Menggunakan Akun Karyawan Perusahaan Anda',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w300,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-              Form(
-                key: _formKey,
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  margin: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Username',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image(
+                          image: AssetImage('assets/images/astina.png'),
+                          height: 250,
+                          width: 250,
                         ),
-                      ),
-                      5.height,
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        child: TextFormField(
-                          controller: _usernameController,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: appSecondaryBackgroundColor,
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none),
+                        Text(
+                          'Astina Absensi Online',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
                           ),
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Username tidak boleh kosong';
-                            }
-                            return null;
-                          },
+                          textAlign: TextAlign.left,
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Password',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                        Text(
+                          'Login Menggunakan Akun Karyawan Perusahaan Anda',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w300,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.left,
-                      ),
-                      5.height,
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        child: TextFormField(
-                          obscureText: _passwordIsVisible,
-                          controller: _passwordController,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: appSecondaryBackgroundColor,
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _passwordIsVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                                color: Colors.black,
+                      ],
+                    ),
+                  ),
+                  Form(
+                    key: _formKey,
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      margin: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Username',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          5.height,
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            child: TextFormField(
+                              controller: _usernameController,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: appSecondaryBackgroundColor,
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none),
                               ),
-                              onPressed: () {
-                                setState(() {
-                                  _passwordIsVisible = !_passwordIsVisible;
-                                });
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Username tidak boleh kosong';
+                                }
+                                return null;
                               },
                             ),
                           ),
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Password tidak boleh kosong';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                      20.height,
-                      const Text(
-                        'Lupa Password?',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                      20.height,
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              await _saveUser();
-                              Get.offAllNamed('/face_scan');
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor:
-                                appColorPrimary, // background color
-                            minimumSize: const Size(250, 50),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25.0),
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Password',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.left,
+                          ),
+                          5.height,
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            child: TextFormField(
+                              obscureText: _passwordIsVisible,
+                              controller: _passwordController,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: appSecondaryBackgroundColor,
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _passwordIsVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Colors.black,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _passwordIsVisible = !_passwordIsVisible;
+                                    });
+                                  },
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Password tidak boleh kosong';
+                                }
+                                return null;
+                              },
                             ),
                           ),
-                          child: const Text('Masuk'),
-                        ),
-                      ),
-                      20.height,
-                      const Align(
-                        alignment: Alignment.center,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Belum punya akun karyawan?',
-                              style: TextStyle(
-                                color: appColorPrimary,
-                                fontSize: 14,
-                              ),
+                          20.height,
+                          const Text(
+                            'Lupa Password?',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
                             ),
-                          ],
-                        ),
+                          ),
+                          20.height,
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  await authController.login(
+                                      _usernameController.text,
+                                      _passwordController.text);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor:
+                                    appColorPrimary, // background color
+                                minimumSize: const Size(250, 50),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(25.0),
+                                ),
+                              ),
+                              child: const Text('Masuk'),
+                            ),
+                          ),
+                          20.height,
+                          const Align(
+                            alignment: Alignment.center,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Belum punya akun karyawan?',
+                                  style: TextStyle(
+                                    color: appColorPrimary,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          50.height,
+                        ],
                       ),
-                      50.height,
-                    ],
+                    ),
+                  ),
+                ],
+              ),
+              Obx(
+                () => Visibility(
+                  visible: authController.isLoading.value,
+                  child: Container(
+                    color: Colors.black.withOpacity(0.5),
+                    child: Center(
+                      child: LoadingAnimationWidget.staggeredDotsWave(
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                    ),
                   ),
                 ),
               ),

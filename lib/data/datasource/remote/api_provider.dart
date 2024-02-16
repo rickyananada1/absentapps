@@ -8,6 +8,7 @@ import '../../../core/error_handler.dart';
 import '../../../core/failure.dart';
 import '../../../core/network_info.dart';
 import '../../../core/request.dart';
+import '../../../domain/entities/user_model.dart';
 import '../../../utils/strings.dart';
 
 class ApiProvider {
@@ -67,5 +68,85 @@ class ApiProvider {
         );
       }
     }
+  }
+
+  Future<Either<Failure, Response>> login(
+      String username, String password) async {
+    const path = Strings.loginEndpoint;
+    Map<String, dynamic> data = {
+      'userName': username,
+      'password': password,
+      'parameters': {
+        'clientId': '1000003',
+        'roleId': '1000027',
+        'organizationId': '1000005',
+        'warehouseId': '1000023',
+        'language': 'en_US',
+      }
+    };
+    return await handleApiResponse(
+      () => request.post(path, data: data),
+      (data) => Response(
+        requestOptions: RequestOptions(
+          path: path,
+          method: 'POST',
+        ),
+        statusCode: 200,
+        statusMessage: 'OK',
+        data: {
+          'status': 'success',
+          'message': 'Login success',
+          'data': {
+            'userId': data['userId'],
+            'language': data['language'],
+            'access_token': data['token'],
+            'expires_in': 108000,
+            'token_type': 'bearer',
+            'scope': 'trust read write',
+          },
+        },
+      ),
+    );
+  }
+
+  Future<Either<Failure, User>> getProfile(String userId) async {
+    var path = '${Strings.profileEndpoint}$userId';
+    // ?$select=NIP,EmployeeName,DoH,Office,Department,Position, C_BPartner_ID
+    Map<String, dynamic> query = {
+      'select': 'NIP,EmployeeName,DoH,Office,Department,Position,C_BPartner_ID',
+    };
+    return await handleApiResponse(
+      () => request.get(path, queryParameters: query),
+      (data) => User.fromJson(data),
+    );
+  }
+
+  Future<Either<Failure, Response>> postImages(
+      String name, String description, String image) async {
+    const path = Strings.postImagesEndpoint;
+    Map<String, dynamic> data = {
+      'IsActive': true,
+      'Name': name,
+      'BinaryData': image,
+      'ImageURL': name,
+      'Description': description,
+      'EntityType': 'U',
+    };
+    return await handleApiResponse(
+      () => request.post(path, data: data),
+      (data) => Response(
+        requestOptions: RequestOptions(
+          path: path,
+          method: 'POST',
+        ),
+        statusCode: 200,
+        statusMessage: 'OK',
+        data: {
+          'status': 'success',
+          'message': 'Image uploaded successfully',
+          'data': data,
+        },
+      ),
+    );
   }
 }

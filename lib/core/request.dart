@@ -1,17 +1,12 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:nb_utils/nb_utils.dart';
 
 import '../utils/strings.dart';
 
 class Request {
   final Dio _dio = Dio();
   Request() {
-    getBaseUrl().then((baseUrl) {
-      updateDioInterceptors(baseUrl);
-    });
+    updateDioInterceptors();
   }
 
   void updateContentType(String contentType) {
@@ -26,30 +21,16 @@ class Request {
     _dio.options.headers.remove('authorization');
   }
 
-  Future<String> getBaseUrl() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('base_url') ?? Strings.baseUrl;
-  }
-
-  void updateBaseUrl(String newBaseUrl) {
-    _dio.options.baseUrl = newBaseUrl;
-    saveBaseUrl(newBaseUrl);
-  }
-
-  void saveBaseUrl(String baseUrl) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('base_url', baseUrl);
-  }
-
-  void updateDioInterceptors(String url) {
+  void updateDioInterceptors() {
     _dio.options = BaseOptions(
-      baseUrl: url,
+      baseUrl: Strings.baseUrl,
       receiveDataWhenStatusError: true,
       validateStatus: (value) {
         return value! <= 500;
       },
       headers: {
         'Accept': 'application/json',
+        'Content-Type': 'application/json'
       },
       connectTimeout: const Duration(seconds: 30),
       sendTimeout: const Duration(seconds: 30),
@@ -180,12 +161,5 @@ class Request {
       path,
       options: Options(headers: headers),
     );
-  }
-
-  // Basic Authentication
-  void setBasicAuth(String username, String password) {
-    final basicAuth =
-        'Basic ${base64Encode(utf8.encode('$username:$password'))}';
-    _dio.options.headers['authorization'] = basicAuth;
   }
 }

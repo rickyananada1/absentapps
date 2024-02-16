@@ -23,11 +23,26 @@ mixin _$User {
   @HiveField(0)
   int? get id => throw _privateConstructorUsedError;
   @HiveField(1)
-  String? get username =>
-      throw _privateConstructorUsedError; // @HiveField(2) Rect? faceRect,
+  String? get username => throw _privateConstructorUsedError;
   @HiveField(2)
-  List<double>? get embeddings => throw _privateConstructorUsedError;
+  String? get uid => throw _privateConstructorUsedError;
   @HiveField(3)
+  String? get NIP => throw _privateConstructorUsedError;
+  @HiveField(4)
+  String? get EmployeeName => throw _privateConstructorUsedError;
+  @HiveField(5)
+  String? get DoH => throw _privateConstructorUsedError;
+  @HiveField(6)
+  String? get Office => throw _privateConstructorUsedError;
+  @HiveField(7)
+  String? get Department => throw _privateConstructorUsedError;
+  @HiveField(8)
+  String? get Position => throw _privateConstructorUsedError;
+  @HiveField(9)
+  String? get model_name => throw _privateConstructorUsedError;
+  @HiveField(10)
+  List<double>? get embeddings => throw _privateConstructorUsedError;
+  @HiveField(11)
   double? get distance => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -43,8 +58,16 @@ abstract class $UserCopyWith<$Res> {
   $Res call(
       {@HiveField(0) int? id,
       @HiveField(1) String? username,
-      @HiveField(2) List<double>? embeddings,
-      @HiveField(3) double? distance});
+      @HiveField(2) String? uid,
+      @HiveField(3) String? NIP,
+      @HiveField(4) String? EmployeeName,
+      @HiveField(5) String? DoH,
+      @HiveField(6) String? Office,
+      @HiveField(7) String? Department,
+      @HiveField(8) String? Position,
+      @HiveField(9) String? model_name,
+      @HiveField(10) List<double>? embeddings,
+      @HiveField(11) double? distance});
 }
 
 /// @nodoc
@@ -62,6 +85,14 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
   $Res call({
     Object? id = freezed,
     Object? username = freezed,
+    Object? uid = freezed,
+    Object? NIP = freezed,
+    Object? EmployeeName = freezed,
+    Object? DoH = freezed,
+    Object? Office = freezed,
+    Object? Department = freezed,
+    Object? Position = freezed,
+    Object? model_name = freezed,
     Object? embeddings = freezed,
     Object? distance = freezed,
   }) {
@@ -73,6 +104,38 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
       username: freezed == username
           ? _value.username
           : username // ignore: cast_nullable_to_non_nullable
+              as String?,
+      uid: freezed == uid
+          ? _value.uid
+          : uid // ignore: cast_nullable_to_non_nullable
+              as String?,
+      NIP: freezed == NIP
+          ? _value.NIP
+          : NIP // ignore: cast_nullable_to_non_nullable
+              as String?,
+      EmployeeName: freezed == EmployeeName
+          ? _value.EmployeeName
+          : EmployeeName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      DoH: freezed == DoH
+          ? _value.DoH
+          : DoH // ignore: cast_nullable_to_non_nullable
+              as String?,
+      Office: freezed == Office
+          ? _value.Office
+          : Office // ignore: cast_nullable_to_non_nullable
+              as String?,
+      Department: freezed == Department
+          ? _value.Department
+          : Department // ignore: cast_nullable_to_non_nullable
+              as String?,
+      Position: freezed == Position
+          ? _value.Position
+          : Position // ignore: cast_nullable_to_non_nullable
+              as String?,
+      model_name: freezed == model_name
+          ? _value.model_name
+          : model_name // ignore: cast_nullable_to_non_nullable
               as String?,
       embeddings: freezed == embeddings
           ? _value.embeddings
@@ -96,8 +159,16 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
   $Res call(
       {@HiveField(0) int? id,
       @HiveField(1) String? username,
-      @HiveField(2) List<double>? embeddings,
-      @HiveField(3) double? distance});
+      @HiveField(2) String? uid,
+      @HiveField(3) String? NIP,
+      @HiveField(4) String? EmployeeName,
+      @HiveField(5) String? DoH,
+      @HiveField(6) String? Office,
+      @HiveField(7) String? Department,
+      @HiveField(8) String? Position,
+      @HiveField(9) String? model_name,
+      @HiveField(10) List<double>? embeddings,
+      @HiveField(11) double? distance});
 }
 
 /// @nodoc
@@ -112,6 +183,14 @@ class __$$UserImplCopyWithImpl<$Res>
   $Res call({
     Object? id = freezed,
     Object? username = freezed,
+    Object? uid = freezed,
+    Object? NIP = freezed,
+    Object? EmployeeName = freezed,
+    Object? DoH = freezed,
+    Object? Office = freezed,
+    Object? Department = freezed,
+    Object? Position = freezed,
+    Object? model_name = freezed,
     Object? embeddings = freezed,
     Object? distance = freezed,
   }) {
@@ -123,6 +202,38 @@ class __$$UserImplCopyWithImpl<$Res>
       username: freezed == username
           ? _value.username
           : username // ignore: cast_nullable_to_non_nullable
+              as String?,
+      uid: freezed == uid
+          ? _value.uid
+          : uid // ignore: cast_nullable_to_non_nullable
+              as String?,
+      NIP: freezed == NIP
+          ? _value.NIP
+          : NIP // ignore: cast_nullable_to_non_nullable
+              as String?,
+      EmployeeName: freezed == EmployeeName
+          ? _value.EmployeeName
+          : EmployeeName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      DoH: freezed == DoH
+          ? _value.DoH
+          : DoH // ignore: cast_nullable_to_non_nullable
+              as String?,
+      Office: freezed == Office
+          ? _value.Office
+          : Office // ignore: cast_nullable_to_non_nullable
+              as String?,
+      Department: freezed == Department
+          ? _value.Department
+          : Department // ignore: cast_nullable_to_non_nullable
+              as String?,
+      Position: freezed == Position
+          ? _value.Position
+          : Position // ignore: cast_nullable_to_non_nullable
+              as String?,
+      model_name: freezed == model_name
+          ? _value.model_name
+          : model_name // ignore: cast_nullable_to_non_nullable
               as String?,
       embeddings: freezed == embeddings
           ? _value._embeddings
@@ -143,8 +254,16 @@ class _$UserImpl extends _User {
   _$UserImpl(
       {@HiveField(0) this.id,
       @HiveField(1) this.username,
-      @HiveField(2) final List<double>? embeddings,
-      @HiveField(3) this.distance})
+      @HiveField(2) this.uid,
+      @HiveField(3) this.NIP,
+      @HiveField(4) this.EmployeeName,
+      @HiveField(5) this.DoH,
+      @HiveField(6) this.Office,
+      @HiveField(7) this.Department,
+      @HiveField(8) this.Position,
+      @HiveField(9) this.model_name,
+      @HiveField(10) final List<double>? embeddings,
+      @HiveField(11) this.distance})
       : _embeddings = embeddings,
         super._();
 
@@ -157,11 +276,33 @@ class _$UserImpl extends _User {
   @override
   @HiveField(1)
   final String? username;
-// @HiveField(2) Rect? faceRect,
-  final List<double>? _embeddings;
-// @HiveField(2) Rect? faceRect,
   @override
   @HiveField(2)
+  final String? uid;
+  @override
+  @HiveField(3)
+  final String? NIP;
+  @override
+  @HiveField(4)
+  final String? EmployeeName;
+  @override
+  @HiveField(5)
+  final String? DoH;
+  @override
+  @HiveField(6)
+  final String? Office;
+  @override
+  @HiveField(7)
+  final String? Department;
+  @override
+  @HiveField(8)
+  final String? Position;
+  @override
+  @HiveField(9)
+  final String? model_name;
+  final List<double>? _embeddings;
+  @override
+  @HiveField(10)
   List<double>? get embeddings {
     final value = _embeddings;
     if (value == null) return null;
@@ -171,12 +312,12 @@ class _$UserImpl extends _User {
   }
 
   @override
-  @HiveField(3)
+  @HiveField(11)
   final double? distance;
 
   @override
   String toString() {
-    return 'User(id: $id, username: $username, embeddings: $embeddings, distance: $distance)';
+    return 'User(id: $id, username: $username, uid: $uid, NIP: $NIP, EmployeeName: $EmployeeName, DoH: $DoH, Office: $Office, Department: $Department, Position: $Position, model_name: $model_name, embeddings: $embeddings, distance: $distance)';
   }
 
   @override
@@ -187,6 +328,18 @@ class _$UserImpl extends _User {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.username, username) ||
                 other.username == username) &&
+            (identical(other.uid, uid) || other.uid == uid) &&
+            (identical(other.NIP, NIP) || other.NIP == NIP) &&
+            (identical(other.EmployeeName, EmployeeName) ||
+                other.EmployeeName == EmployeeName) &&
+            (identical(other.DoH, DoH) || other.DoH == DoH) &&
+            (identical(other.Office, Office) || other.Office == Office) &&
+            (identical(other.Department, Department) ||
+                other.Department == Department) &&
+            (identical(other.Position, Position) ||
+                other.Position == Position) &&
+            (identical(other.model_name, model_name) ||
+                other.model_name == model_name) &&
             const DeepCollectionEquality()
                 .equals(other._embeddings, _embeddings) &&
             (identical(other.distance, distance) ||
@@ -195,8 +348,20 @@ class _$UserImpl extends _User {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, username,
-      const DeepCollectionEquality().hash(_embeddings), distance);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      username,
+      uid,
+      NIP,
+      EmployeeName,
+      DoH,
+      Office,
+      Department,
+      Position,
+      model_name,
+      const DeepCollectionEquality().hash(_embeddings),
+      distance);
 
   @JsonKey(ignore: true)
   @override
@@ -216,8 +381,16 @@ abstract class _User extends User {
   factory _User(
       {@HiveField(0) final int? id,
       @HiveField(1) final String? username,
-      @HiveField(2) final List<double>? embeddings,
-      @HiveField(3) final double? distance}) = _$UserImpl;
+      @HiveField(2) final String? uid,
+      @HiveField(3) final String? NIP,
+      @HiveField(4) final String? EmployeeName,
+      @HiveField(5) final String? DoH,
+      @HiveField(6) final String? Office,
+      @HiveField(7) final String? Department,
+      @HiveField(8) final String? Position,
+      @HiveField(9) final String? model_name,
+      @HiveField(10) final List<double>? embeddings,
+      @HiveField(11) final double? distance}) = _$UserImpl;
   _User._() : super._();
 
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
@@ -228,11 +401,35 @@ abstract class _User extends User {
   @override
   @HiveField(1)
   String? get username;
-  @override // @HiveField(2) Rect? faceRect,
+  @override
   @HiveField(2)
-  List<double>? get embeddings;
+  String? get uid;
   @override
   @HiveField(3)
+  String? get NIP;
+  @override
+  @HiveField(4)
+  String? get EmployeeName;
+  @override
+  @HiveField(5)
+  String? get DoH;
+  @override
+  @HiveField(6)
+  String? get Office;
+  @override
+  @HiveField(7)
+  String? get Department;
+  @override
+  @HiveField(8)
+  String? get Position;
+  @override
+  @HiveField(9)
+  String? get model_name;
+  @override
+  @HiveField(10)
+  List<double>? get embeddings;
+  @override
+  @HiveField(11)
   double? get distance;
   @override
   @JsonKey(ignore: true)

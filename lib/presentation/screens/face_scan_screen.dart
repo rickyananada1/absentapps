@@ -1,20 +1,12 @@
 import 'dart:io';
-import 'dart:math' as math;
-
-import 'package:absentapps/utils/colors.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:lottie/lottie.dart';
-import 'package:image/image.dart' as img;
-import 'package:nb_utils/nb_utils.dart';
-import 'package:permission_handler/permission_handler.dart';
 
-import '../../domain/entities/user_model.dart';
 import '../../services/ml_service.dart';
-import '../../utils/local_db.dart';
+import '../controllers/face_scan_controller.dart';
 
 List<CameraDescription>? cameras;
 
@@ -26,28 +18,12 @@ class FaceScanScreen extends StatefulWidget {
 }
 
 class _FaceScanScreenState extends State<FaceScanScreen> {
+  final FaceScanController faceScanController = Get.put(FaceScanController());
   late CameraController _cameraController;
   bool isControllerInitialized = false;
   bool flash = false;
   late FaceDetector faceDetector;
-  File? _image;
   late MLService mlService;
-
-  Future<void> requestPermissions() async {
-    await [
-      Permission.camera,
-      Permission.storage,
-      Permission.microphone,
-    ].request();
-
-    if (await Permission.camera.isGranted) {
-      log('Camera permission granted');
-    }
-
-    if (await Permission.storage.isGranted) {
-      log('Storage permission granted');
-    }
-  }
 
   Future initializeCamera() async {
     cameras = await availableCameras();
@@ -61,121 +37,13 @@ class _FaceScanScreenState extends State<FaceScanScreen> {
   Future<void> takePicture() async {
     XFile file = await _cameraController.takePicture();
     if (file.path.isNotEmpty) {
-      _image = File(file.path);
-      await doFaceDetection();
+      faceScanController.image.value = File(file.path);
+      await faceScanController.doFaceDetection();
     }
-  }
-
-  var image;
-  List<Face> faces = [];
-
-  Future<void> doFaceDetection() async {
-    if (_image != null) {
-      _image = await removeRotation(_image!);
-
-      image = await _image?.readAsBytes();
-      image = await decodeImageFromList(image);
-
-      InputImage inputImage = InputImage.fromFile(_image!);
-      faces = await faceDetector.processImage(inputImage);
-      for (Face face in faces) {
-        Rect faceRect = face.boundingBox;
-        num left = faceRect.left < 0 ? 0 : faceRect.left;
-        num top = faceRect.top < 0 ? 0 : faceRect.top;
-        num right =
-            faceRect.right > image.width ? image.width - 1 : faceRect.right;
-        num bottom =
-            faceRect.bottom > image.height ? image.height - 1 : faceRect.bottom;
-        num width = right - left;
-        num height = bottom - top;
-
-        final bytes = _image!.readAsBytesSync();
-        final img.Image capturedImage = img.decodeImage(bytes)!;
-        final img.Image cropedFace = img.copyCrop(capturedImage,
-            x: left.toInt(),
-            y: top.toInt(),
-            width: width.toInt(),
-            height: height.toInt());
-        User? user = await LocalDb().getUser();
-        if (user!.embeddings == null) {
-          List<double> embeddings = mlService.getEmbeddings(cropedFace);
-          if (embeddings.isNotEmpty) {
-            mlService.registerFaceInDB(embeddings);
-          }
-          showFaceRegistrationDialogue(
-              Uint8List.fromList(img.encodeBmp(cropedFace)));
-        } else {
-          bool isMatched = await mlService.compareFaces(cropedFace);
-          if (isMatched) {
-            toast("Face Matched");
-            Get.offNamed('/dashboard');
-          } else {
-            toast("Face Not Matched");
-          }
-        }
-      }
-    }
-  }
-
-  removeRotation(File inputImage) async {
-    final img.Image? capturedImage =
-        img.decodeImage(await File(inputImage.path).readAsBytes());
-    final img.Image orientedImage = img.bakeOrientation(capturedImage!);
-    return await File(_image!.path).writeAsBytes(img.encodeJpg(orientedImage));
-  }
-
-  showFaceRegistrationDialogue(Uint8List cropedFace) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("Face Registration", textAlign: TextAlign.center),
-        alignment: Alignment.center,
-        content: SizedBox(
-          height: 340,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(
-                height: 20,
-              ),
-              Transform(
-                alignment: Alignment.center,
-                transform: Matrix4.rotationY(math.pi),
-                child: Image.memory(
-                  cropedFace,
-                  width: 200,
-                  height: 200,
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Get.showSnackbar(const GetSnackBar(
-                    title: "Face Registered",
-                    message: "Face Registered",
-                    duration: Duration(seconds: 2),
-                  ));
-                  Get.offNamed('/dashboard');
-                },
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: appColorPrimary,
-                    minimumSize: const Size(200, 40)),
-                child: const Text("Register", style: TextStyle(color: white)),
-              ),
-            ],
-          ),
-        ),
-        contentPadding: EdgeInsets.zero,
-      ),
-    );
   }
 
   @override
   void initState() {
-    requestPermissions();
     initializeCamera();
     final options = FaceDetectorOptions(
       performanceMode: FaceDetectorMode.accurate,

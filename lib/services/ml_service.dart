@@ -25,7 +25,6 @@ class MLService {
 
   Future<void> initialize() async {
     user = await LocalDb().getUser();
-    print('User: $user');
   }
 
   void registerFaceInDB(List<double> embedding) async {

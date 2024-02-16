@@ -2,6 +2,8 @@ import 'package:get_it/get_it.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 import '../data/datasource/remote/api_provider.dart';
+import '../data/repository/auth_repository.dart';
+import '../presentation/controllers/auth_controller.dart';
 import 'network_info.dart';
 import 'request.dart';
 
@@ -23,4 +25,12 @@ Future<void> setUpServiceLocator() async {
         sharedPreferences: serviceLocator<SharedPreferences>(),
         networkInfo: serviceLocator<NetworkInfo>(),
       ));
+
+  // Register AuthRepository
+  serviceLocator.registerLazySingleton(() => AuthRepository(
+        apiProvider: serviceLocator<ApiProvider>(),
+      ));
+
+  // Register AuthController
+  serviceLocator.registerLazySingleton(() => AuthController());
 }
