@@ -11,18 +11,16 @@ class HomeController extends GetxController {
   int limit = 100;
   RxBool isLoading = false.obs;
   bool hasMore = true;
+  RxBool fingerType = false.obs;
 
   Future<void> loadData() async {
     if (!dataFetched.value) {
-      // Fetch data using GetX controllers
-      await authController
-          .getProfile(getStringAsync('USER_ID', defaultValue: ''));
-
+      await authController.getProfile();
+      fingerType.value = getBoolAsync('FINGER_TYPE', defaultValue: false);
       dataFetched.value = true;
     } else {
       isLoading.value = true;
-      await authController
-          .getProfile(getStringAsync('USER_ID', defaultValue: ''));
+      await authController.getProfile();
       isLoading.value = false;
     }
   }

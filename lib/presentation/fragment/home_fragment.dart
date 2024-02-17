@@ -1,4 +1,3 @@
-import 'package:absentapps/utils/colors.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +6,9 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 import '../../app/view/app.dart';
+import '../../utils/colors.dart';
 import '../controllers/home_controller.dart';
+import '../screens/attendance_screen.dart';
 
 class HomeFragment extends StatefulWidget {
   const HomeFragment({super.key});
@@ -16,7 +17,10 @@ class HomeFragment extends StatefulWidget {
   State<HomeFragment> createState() => _HomeFragmentState();
 }
 
-class _HomeFragmentState extends State<HomeFragment> {
+class _HomeFragmentState extends State<HomeFragment>
+    with AutomaticKeepAliveClientMixin<HomeFragment> {
+  @override
+  bool get wantKeepAlive => true;
   final HomeController controller = Get.put(HomeController());
   Future<void> init() async {
     setStatusBarColor(appStore.isDarkModeOn.value ? black : appColorPrimary,
@@ -34,39 +38,54 @@ class _HomeFragmentState extends State<HomeFragment> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: white,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        child: SizedBox(
-          width: double.infinity,
-          child: FloatingActionButton.extended(
-            onPressed: () {},
-            icon: const Icon(Icons.exit_to_app),
-            label: const Text('Clock In'),
-            backgroundColor: appColorPrimary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30.0),
+    super.build(context);
+    return Obx(
+      () {
+        if (controller.dataFetched.isFalse) {
+          return Container(
+            color: Colors.black.withOpacity(0.5),
+            child: Center(
+              child: LoadingAnimationWidget.staggeredDotsWave(
+                color: Colors.white,
+                size: 30,
+              ),
             ),
-          ),
-        ),
-      ),
-      body: SafeArea(
-        child: Obx(
-          () {
-            if (controller.dataFetched.isFalse) {
-              return Container(
-                color: Colors.black.withOpacity(0.5),
-                child: Center(
-                  child: LoadingAnimationWidget.staggeredDotsWave(
-                    color: Colors.white,
-                    size: 30,
+          );
+        } else {
+          return Scaffold(
+            backgroundColor: white,
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+            floatingActionButton: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Obx(
+                () => SizedBox(
+                  width: double.infinity,
+                  child: FloatingActionButton.extended(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AttendanceScreen(),
+                        ),
+                      );
+                    },
+                    icon: controller.fingerType.value == true
+                        ? const Icon(Icons.login)
+                        : const Icon(Icons.exit_to_app),
+                    label: controller.fingerType.value == true
+                        ? const Text('Clock Out')
+                        : const Text('Clock In'),
+                    backgroundColor: appColorPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                    ),
                   ),
                 ),
-              );
-            } else {
-              return SingleChildScrollView(
+              ),
+            ),
+            body: SafeArea(
+              child: SingleChildScrollView(
                 child: Column(
                   children: [
                     Stack(
@@ -76,7 +95,7 @@ class _HomeFragmentState extends State<HomeFragment> {
                             Container(
                               width: double.infinity,
                               height:
-                                  200 + MediaQuery.of(context).viewPadding.top,
+                                  MediaQuery.of(context).size.height * 0.3 - 60,
                               decoration: const BoxDecoration(
                                 gradient: LinearGradient(
                                   begin: Alignment.bottomCenter,
@@ -91,10 +110,6 @@ class _HomeFragmentState extends State<HomeFragment> {
                                     bottomRight: Radius.circular(20.0)),
                               ),
                             ),
-                            Container(
-                                width: double.infinity,
-                                height: 100,
-                                color: Colors.white),
                           ],
                         ),
                         Container(
@@ -111,7 +126,7 @@ class _HomeFragmentState extends State<HomeFragment> {
                                     width: 50,
                                     height: 50,
                                   ),
-                                  const SizedBox(width: 10.0),
+                                  10.width,
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
@@ -120,7 +135,7 @@ class _HomeFragmentState extends State<HomeFragment> {
                                         Row(
                                           children: [
                                             const Text(
-                                              'PT Inspirasi Aksara Digital',
+                                              'PT. Abadi Ogan Cemerlang',
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 20,
@@ -145,7 +160,7 @@ class _HomeFragmentState extends State<HomeFragment> {
                                   )
                                 ],
                               ),
-                              const SizedBox(height: 30),
+                              30.height,
                               Container(
                                 width: double.infinity,
                                 decoration: BoxDecoration(
@@ -232,7 +247,7 @@ class _HomeFragmentState extends State<HomeFragment> {
                                 FontAwesomeIcons.circleUser,
                                 size: 40,
                               ),
-                              const SizedBox(width: 10.0),
+                              10.width,
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -418,11 +433,11 @@ class _HomeFragmentState extends State<HomeFragment> {
                     // )
                   ],
                 ),
-              );
-            }
-          },
-        ),
-      ),
+              ),
+            ),
+          );
+        }
+      },
     );
   }
 }

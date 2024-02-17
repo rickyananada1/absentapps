@@ -2,13 +2,16 @@ import 'dart:io';
 
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 import '../../../core/error_handler.dart';
 import '../../../core/failure.dart';
 import '../../../core/network_info.dart';
 import '../../../core/request.dart';
+import '../../../domain/entities/activity_model.dart';
 import '../../../domain/entities/user_model.dart';
+import '../../../domain/entities/working_location_model.dart';
 import '../../../utils/strings.dart';
 
 class ApiProvider {
@@ -109,15 +112,14 @@ class ApiProvider {
     );
   }
 
-  Future<Either<Failure, User>> getProfile(String userId) async {
+  Future<Either<Failure, UserModel>> getProfile(String userId) async {
     var path = '${Strings.profileEndpoint}$userId';
-    // ?$select=NIP,EmployeeName,DoH,Office,Department,Position, C_BPartner_ID
     Map<String, dynamic> query = {
       'select': 'NIP,EmployeeName,DoH,Office,Department,Position,C_BPartner_ID',
     };
     return await handleApiResponse(
       () => request.get(path, queryParameters: query),
-      (data) => User.fromJson(data),
+      (data) => UserModel.fromJson(data),
     );
   }
 
@@ -147,6 +149,67 @@ class ApiProvider {
           'data': data,
         },
       ),
+    );
+  }
+
+  Future<Either<Failure, List<Activity>>> getActivities() async {
+    const path = Strings.activitiesEndpoint;
+    Map<String, dynamic> query = {
+      'select':
+          'DateFinger,HR_Location_ID,Latitude,Longitude,Distance,FingerType',
+    };
+    return await handleApiResponse(
+      () => request.get(path, queryParameters: query),
+      (data) {
+        List<Activity> activities = [];
+        for (var item in data['records']) {
+          activities.add(Activity.fromJson(item));
+        }
+        return activities;
+      },
+    );
+  }
+
+  Future<Either<Failure, List<WorkingLocation>>> getWorkingLocations() async {
+    const path = Strings.workingLocationsEndpoint;
+    Map<String, dynamic> query = {
+      'select': 'Name,Latitude,Longitude,Radius',
+    };
+    return await handleApiResponse(
+      () => request.get(path, queryParameters: query),
+      (data) {
+        List<WorkingLocation> workingLocations = [];
+        for (var item in data['records']) {
+          workingLocations.add(WorkingLocation.fromJson(item));
+        }
+        return workingLocations;
+      },
+    );
+  }
+
+  Future<Either<Failure, Activity>> postAttendance(
+    String partnerId,
+    DateTime date,
+    double latitude,
+    double longitude,
+    int distance,
+    String fingerType,
+  ) async {
+    const path = Strings.postAttendanceEndpoint;
+    Map<String, dynamic> data = {
+      'C_BPartner_ID': partnerId,
+      //2024-02-15T08:10:10Z
+      'DateFinger': '${DateFormat('yyyy-MM-ddTHH:mm:ssZ').format(date)}Z',
+      'HR_Location_ID':
+          '1000000', // '1000000' is the default value for 'HR_Location_ID
+      'Latitude': latitude,
+      'Longitude': longitude,
+      'Distance': distance,
+      'FingerType': fingerType,
+    };
+    return await handleApiResponse(
+      () => request.post(path, data: data),
+      (data) => Activity.fromJson(data),
     );
   }
 }

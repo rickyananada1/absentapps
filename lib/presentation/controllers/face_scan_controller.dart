@@ -7,16 +7,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as img;
+import 'package:nb_utils/nb_utils.dart';
 
-import '../../domain/entities/user_model.dart';
+import '../../domain/entities/user.dart';
 import '../../services/ml_service.dart';
 import '../../utils/local_db.dart';
 import 'auth_controller.dart';
 
 class FaceScanController extends GetxController {
   final AuthController authController = Get.put(AuthController());
-  RxBool isControllerInitialized = false.obs;
-  RxBool flash = false.obs;
+
   RxList<Face> faces = <Face>[].obs;
   Rxn<File> image = Rxn<File>();
   late FaceDetector faceDetector;
@@ -60,7 +60,8 @@ class FaceScanController extends GetxController {
             width: width.toInt(),
             height: height.toInt());
 
-        User? user = await LocalDb().getUser();
+        User? user = await LocalDb()
+            .getUser(getStringAsync('USER_ID', defaultValue: ''));
         if (user!.embeddings == null) {
           showFaceRegistrationDialogue(cropedFace);
         } else {
@@ -86,12 +87,14 @@ class FaceScanController extends GetxController {
         .writeAsBytes(img.encodeJpg(orientedImage));
   }
 
-  void showFaceRegistrationDialogue(img.Image cropedFace) {
+  void showFaceRegistrationDialogue(img.Image cropedFace) async {
+    User? user =
+        await LocalDb().getUser(getStringAsync('USER_ID', defaultValue: ''));
     Get.dialog(
       AlertDialog(
         title: const Text("Face Registration", textAlign: TextAlign.center),
         content: SizedBox(
-          height: 340,
+          height: 400,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -105,7 +108,23 @@ class FaceScanController extends GetxController {
                   height: 200,
                 ),
               ),
-              const SizedBox(height: 10),
+              10.height,
+              Container(
+                width: 200,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  user!.NIP!,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              10.height,
               ElevatedButton(
                 onPressed: () {
                   Get.back();
@@ -125,7 +144,7 @@ class FaceScanController extends GetxController {
                   }
                   // convert image to binary and save in db
                   String bytes = base64Encode(img.encodeJpg(cropedFace));
-                  await authController.postImages(bytes);
+                  await authController.postImages(bytes, user);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,

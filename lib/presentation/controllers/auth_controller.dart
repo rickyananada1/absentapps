@@ -5,6 +5,7 @@ import 'package:nb_utils/nb_utils.dart';
 import '../../core/request.dart';
 import '../../core/service_locator.dart';
 import '../../data/repository/auth_repository.dart';
+import '../../domain/entities/user.dart';
 import '../../domain/entities/user_model.dart';
 import '../../utils/local_db.dart';
 
@@ -12,19 +13,12 @@ class AuthController extends GetxController {
   final _apiProvider = serviceLocator<AuthRepository>();
 
   final RxBool isLoading = false.obs;
-  final RxBool isLoggedIn = false.obs;
-  final Rx<User?> user = Rx<User?>(null);
+  final Rx<UserModel?> user = Rx<UserModel?>(null);
 
   @override
   void onInit() {
     isLoading.value = false;
     super.onInit();
-  }
-
-  @override
-  void onReady() async {
-    await checkLogin();
-    super.onReady();
   }
 
   Future<void> login(String username, String password) async {
@@ -42,34 +36,26 @@ class AuthController extends GetxController {
         );
       },
       (data) async {
-        isLoggedIn.value = true;
         serviceLocator<Request>()
             .updateAuthorization(data.data['data']['access_token']);
         setValue('TOKEN', data.data['data']['access_token']);
         setValue('USER_ID', data.data['data']['userId'].toString());
-        setValue('IS_LOGGED_IN', true);
-        await getProfile(data.data['data']['userId'].toString());
-        await LocalDb().saveUser(User(
-          username: username,
-        ));
+        await getProfile();
+        // check if user exists in local db
+        // if not, save user to local db
+        await checkUser();
         Get.offNamed('/face_scan');
       },
     );
   }
 
-  Future<void> getProfile(String userId) async {
+  Future<void> getProfile() async {
+    String userId = getStringAsync('USER_ID', defaultValue: '');
     final response = await _apiProvider.getProfile(userId);
     response.fold(
       (failure) async {
-        Get.defaultDialog(
-          title: 'Error',
-          content: Text(failure.message),
-          textConfirm: 'OK',
-          confirmTextColor: Colors.white,
-          onConfirm: () => Get.back(),
-        );
         if (failure.code == 401) {
-          // logout();
+          await logout();
         }
       },
       (data) async {
@@ -78,10 +64,16 @@ class AuthController extends GetxController {
     );
   }
 
-  Future<void> postImages(String image) async {
+  Future<void> logout() async {
+    await setValue('TOKEN', '');
+    await setValue('USER_ID', '');
+    Get.offAllNamed('/login');
+  }
+
+  Future<void> postImages(String image, User user) async {
     isLoading.value = true;
-    var name = '${user.value!.username}.jpg';
-    var description = 'Face Image of ${user.value!.username}';
+    var name = '${user.NIP}.jpg';
+    var description = 'Face Image of ${user.NIP}';
     final response = await _apiProvider.postImages(name, description, image);
     isLoading.value = false;
     response.fold(
@@ -103,13 +95,36 @@ class AuthController extends GetxController {
     );
   }
 
-  Future<void> checkLogin() async {
-    final token = getStringAsync('TOKEN');
+  Future<bool> checkLogin() async {
+    var token = getStringAsync('TOKEN', defaultValue: '');
     if (token.isNotEmpty) {
       serviceLocator<Request>().updateAuthorization(token);
-      final userId = getStringAsync('USER_ID', defaultValue: '');
-      await getProfile(userId);
-      isLoggedIn.value = true;
+      await getProfile();
+    }
+    return token.isNotEmpty;
+  }
+
+  Future<void> checkUser() async {
+    var userExists =
+        await LocalDb().getUser(getStringAsync('USER_ID', defaultValue: ''));
+    if (userExists == null) {
+      await LocalDb().saveUser(
+          User(
+            NIP: user.value!.NIP,
+            EmployeeName: user.value!.EmployeeName,
+            embeddings: null,
+            C_BPartner_ID: user.value!.C_BPartner_ID!.id.toString(),
+          ),
+          getStringAsync('USER_ID', defaultValue: ''));
+    } else {
+      await LocalDb().saveUser(
+          User(
+            NIP: user.value!.NIP,
+            EmployeeName: user.value!.EmployeeName,
+            embeddings: userExists.embeddings,
+            C_BPartner_ID: user.value!.C_BPartner_ID!.id.toString(),
+          ),
+          getStringAsync('USER_ID', defaultValue: ''));
     }
   }
 }

@@ -1,11 +1,12 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:absentapps/utils/local_db.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as img;
 
-import '../domain/entities/user_model.dart';
+import '../domain/entities/user.dart';
+import '../utils/local_db.dart';
 
 class MLService {
   late Interpreter interpreter;
@@ -24,11 +25,13 @@ class MLService {
   }
 
   Future<void> initialize() async {
-    user = await LocalDb().getUser();
+    user = await LocalDb().getUser(getStringAsync('USER_ID', defaultValue: ''));
   }
 
   void registerFaceInDB(List<double> embedding) async {
-    await LocalDb().saveUser(user!.copyWith(embeddings: embedding));
+    user!.embeddings = embedding;
+    await LocalDb()
+        .saveUser(user!, getStringAsync('USER_ID', defaultValue: ''));
   }
 
   Future<void> loadModel() async {

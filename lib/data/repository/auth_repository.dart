@@ -15,7 +15,7 @@ class AuthRepository {
     return await _apiProvider.login(username, password);
   }
 
-  Future<Either<Failure, User>> getProfile(String userId) async {
+  Future<Either<Failure, UserModel>> getProfile(String userId) async {
     return await _apiProvider.getProfile(userId);
   }
 

@@ -10,7 +10,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'app/app.dart';
 import 'core/service_locator.dart';
-import 'domain/entities/user_model.dart';
+import 'domain/entities/user.dart';
 import 'utils/constant.dart';
 import 'utils/http_override.dart';
 

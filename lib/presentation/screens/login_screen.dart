@@ -1,9 +1,9 @@
-import 'package:absentapps/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:nb_utils/nb_utils.dart';
 
+import '../../utils/colors.dart';
 import '../controllers/auth_controller.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -112,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           SizedBox(
                             width: MediaQuery.of(context).size.width * 0.8,
                             child: TextFormField(
-                              obscureText: _passwordIsVisible,
+                              obscureText: !_passwordIsVisible,
                               controller: _passwordController,
                               decoration: InputDecoration(
                                 filled: true,
@@ -122,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     borderSide: BorderSide.none),
                                 suffixIcon: IconButton(
                                   icon: Icon(
-                                    _passwordIsVisible
+                                    !_passwordIsVisible
                                         ? Icons.visibility
                                         : Icons.visibility_off,
                                     color: Colors.black,

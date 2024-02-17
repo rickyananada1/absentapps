@@ -14,66 +14,57 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-User _$UserFromJson(Map<String, dynamic> json) {
-  return _User.fromJson(json);
+UserModel _$UserModelFromJson(Map<String, dynamic> json) {
+  return _UserModel.fromJson(json);
 }
 
 /// @nodoc
-mixin _$User {
-  @HiveField(0)
+mixin _$UserModel {
   int? get id => throw _privateConstructorUsedError;
-  @HiveField(1)
-  String? get username => throw _privateConstructorUsedError;
-  @HiveField(2)
   String? get uid => throw _privateConstructorUsedError;
-  @HiveField(3)
+  C_BPartner_IDModel? get C_BPartner_ID => throw _privateConstructorUsedError;
   String? get NIP => throw _privateConstructorUsedError;
-  @HiveField(4)
   String? get EmployeeName => throw _privateConstructorUsedError;
-  @HiveField(5)
   String? get DoH => throw _privateConstructorUsedError;
-  @HiveField(6)
   String? get Office => throw _privateConstructorUsedError;
-  @HiveField(7)
   String? get Department => throw _privateConstructorUsedError;
-  @HiveField(8)
   String? get Position => throw _privateConstructorUsedError;
-  @HiveField(9)
   String? get model_name => throw _privateConstructorUsedError;
-  @HiveField(10)
   List<double>? get embeddings => throw _privateConstructorUsedError;
-  @HiveField(11)
   double? get distance => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
-  $UserCopyWith<User> get copyWith => throw _privateConstructorUsedError;
+  $UserModelCopyWith<UserModel> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $UserCopyWith<$Res> {
-  factory $UserCopyWith(User value, $Res Function(User) then) =
-      _$UserCopyWithImpl<$Res, User>;
+abstract class $UserModelCopyWith<$Res> {
+  factory $UserModelCopyWith(UserModel value, $Res Function(UserModel) then) =
+      _$UserModelCopyWithImpl<$Res, UserModel>;
   @useResult
   $Res call(
-      {@HiveField(0) int? id,
-      @HiveField(1) String? username,
-      @HiveField(2) String? uid,
-      @HiveField(3) String? NIP,
-      @HiveField(4) String? EmployeeName,
-      @HiveField(5) String? DoH,
-      @HiveField(6) String? Office,
-      @HiveField(7) String? Department,
-      @HiveField(8) String? Position,
-      @HiveField(9) String? model_name,
-      @HiveField(10) List<double>? embeddings,
-      @HiveField(11) double? distance});
+      {int? id,
+      String? uid,
+      C_BPartner_IDModel? C_BPartner_ID,
+      String? NIP,
+      String? EmployeeName,
+      String? DoH,
+      String? Office,
+      String? Department,
+      String? Position,
+      String? model_name,
+      List<double>? embeddings,
+      double? distance});
+
+  $C_BPartner_IDModelCopyWith<$Res>? get C_BPartner_ID;
 }
 
 /// @nodoc
-class _$UserCopyWithImpl<$Res, $Val extends User>
-    implements $UserCopyWith<$Res> {
-  _$UserCopyWithImpl(this._value, this._then);
+class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
+    implements $UserModelCopyWith<$Res> {
+  _$UserModelCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
@@ -84,8 +75,8 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
   @override
   $Res call({
     Object? id = freezed,
-    Object? username = freezed,
     Object? uid = freezed,
+    Object? C_BPartner_ID = freezed,
     Object? NIP = freezed,
     Object? EmployeeName = freezed,
     Object? DoH = freezed,
@@ -101,14 +92,14 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
-      username: freezed == username
-          ? _value.username
-          : username // ignore: cast_nullable_to_non_nullable
-              as String?,
       uid: freezed == uid
           ? _value.uid
           : uid // ignore: cast_nullable_to_non_nullable
               as String?,
+      C_BPartner_ID: freezed == C_BPartner_ID
+          ? _value.C_BPartner_ID
+          : C_BPartner_ID // ignore: cast_nullable_to_non_nullable
+              as C_BPartner_IDModel?,
       NIP: freezed == NIP
           ? _value.NIP
           : NIP // ignore: cast_nullable_to_non_nullable
@@ -147,43 +138,60 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
               as double?,
     ) as $Val);
   }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $C_BPartner_IDModelCopyWith<$Res>? get C_BPartner_ID {
+    if (_value.C_BPartner_ID == null) {
+      return null;
+    }
+
+    return $C_BPartner_IDModelCopyWith<$Res>(_value.C_BPartner_ID!, (value) {
+      return _then(_value.copyWith(C_BPartner_ID: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
-abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
-  factory _$$UserImplCopyWith(
-          _$UserImpl value, $Res Function(_$UserImpl) then) =
-      __$$UserImplCopyWithImpl<$Res>;
+abstract class _$$UserModelImplCopyWith<$Res>
+    implements $UserModelCopyWith<$Res> {
+  factory _$$UserModelImplCopyWith(
+          _$UserModelImpl value, $Res Function(_$UserModelImpl) then) =
+      __$$UserModelImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
-      {@HiveField(0) int? id,
-      @HiveField(1) String? username,
-      @HiveField(2) String? uid,
-      @HiveField(3) String? NIP,
-      @HiveField(4) String? EmployeeName,
-      @HiveField(5) String? DoH,
-      @HiveField(6) String? Office,
-      @HiveField(7) String? Department,
-      @HiveField(8) String? Position,
-      @HiveField(9) String? model_name,
-      @HiveField(10) List<double>? embeddings,
-      @HiveField(11) double? distance});
+      {int? id,
+      String? uid,
+      C_BPartner_IDModel? C_BPartner_ID,
+      String? NIP,
+      String? EmployeeName,
+      String? DoH,
+      String? Office,
+      String? Department,
+      String? Position,
+      String? model_name,
+      List<double>? embeddings,
+      double? distance});
+
+  @override
+  $C_BPartner_IDModelCopyWith<$Res>? get C_BPartner_ID;
 }
 
 /// @nodoc
-class __$$UserImplCopyWithImpl<$Res>
-    extends _$UserCopyWithImpl<$Res, _$UserImpl>
-    implements _$$UserImplCopyWith<$Res> {
-  __$$UserImplCopyWithImpl(_$UserImpl _value, $Res Function(_$UserImpl) _then)
+class __$$UserModelImplCopyWithImpl<$Res>
+    extends _$UserModelCopyWithImpl<$Res, _$UserModelImpl>
+    implements _$$UserModelImplCopyWith<$Res> {
+  __$$UserModelImplCopyWithImpl(
+      _$UserModelImpl _value, $Res Function(_$UserModelImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? id = freezed,
-    Object? username = freezed,
     Object? uid = freezed,
+    Object? C_BPartner_ID = freezed,
     Object? NIP = freezed,
     Object? EmployeeName = freezed,
     Object? DoH = freezed,
@@ -194,19 +202,19 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? embeddings = freezed,
     Object? distance = freezed,
   }) {
-    return _then(_$UserImpl(
+    return _then(_$UserModelImpl(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
-      username: freezed == username
-          ? _value.username
-          : username // ignore: cast_nullable_to_non_nullable
-              as String?,
       uid: freezed == uid
           ? _value.uid
           : uid // ignore: cast_nullable_to_non_nullable
               as String?,
+      C_BPartner_ID: freezed == C_BPartner_ID
+          ? _value.C_BPartner_ID
+          : C_BPartner_ID // ignore: cast_nullable_to_non_nullable
+              as C_BPartner_IDModel?,
       NIP: freezed == NIP
           ? _value.NIP
           : NIP // ignore: cast_nullable_to_non_nullable
@@ -249,60 +257,47 @@ class __$$UserImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-@HiveType(typeId: 0, adapterName: 'UserAdapter')
-class _$UserImpl extends _User {
-  _$UserImpl(
-      {@HiveField(0) this.id,
-      @HiveField(1) this.username,
-      @HiveField(2) this.uid,
-      @HiveField(3) this.NIP,
-      @HiveField(4) this.EmployeeName,
-      @HiveField(5) this.DoH,
-      @HiveField(6) this.Office,
-      @HiveField(7) this.Department,
-      @HiveField(8) this.Position,
-      @HiveField(9) this.model_name,
-      @HiveField(10) final List<double>? embeddings,
-      @HiveField(11) this.distance})
-      : _embeddings = embeddings,
-        super._();
+class _$UserModelImpl implements _UserModel {
+  const _$UserModelImpl(
+      {required this.id,
+      required this.uid,
+      required this.C_BPartner_ID,
+      required this.NIP,
+      required this.EmployeeName,
+      required this.DoH,
+      required this.Office,
+      required this.Department,
+      required this.Position,
+      required this.model_name,
+      required final List<double>? embeddings,
+      required this.distance})
+      : _embeddings = embeddings;
 
-  factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
-      _$$UserImplFromJson(json);
+  factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$UserModelImplFromJson(json);
 
   @override
-  @HiveField(0)
   final int? id;
   @override
-  @HiveField(1)
-  final String? username;
-  @override
-  @HiveField(2)
   final String? uid;
   @override
-  @HiveField(3)
+  final C_BPartner_IDModel? C_BPartner_ID;
+  @override
   final String? NIP;
   @override
-  @HiveField(4)
   final String? EmployeeName;
   @override
-  @HiveField(5)
   final String? DoH;
   @override
-  @HiveField(6)
   final String? Office;
   @override
-  @HiveField(7)
   final String? Department;
   @override
-  @HiveField(8)
   final String? Position;
   @override
-  @HiveField(9)
   final String? model_name;
   final List<double>? _embeddings;
   @override
-  @HiveField(10)
   List<double>? get embeddings {
     final value = _embeddings;
     if (value == null) return null;
@@ -312,23 +307,22 @@ class _$UserImpl extends _User {
   }
 
   @override
-  @HiveField(11)
   final double? distance;
 
   @override
   String toString() {
-    return 'User(id: $id, username: $username, uid: $uid, NIP: $NIP, EmployeeName: $EmployeeName, DoH: $DoH, Office: $Office, Department: $Department, Position: $Position, model_name: $model_name, embeddings: $embeddings, distance: $distance)';
+    return 'UserModel(id: $id, uid: $uid, C_BPartner_ID: $C_BPartner_ID, NIP: $NIP, EmployeeName: $EmployeeName, DoH: $DoH, Office: $Office, Department: $Department, Position: $Position, model_name: $model_name, embeddings: $embeddings, distance: $distance)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$UserImpl &&
+            other is _$UserModelImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.username, username) ||
-                other.username == username) &&
             (identical(other.uid, uid) || other.uid == uid) &&
+            (identical(other.C_BPartner_ID, C_BPartner_ID) ||
+                other.C_BPartner_ID == C_BPartner_ID) &&
             (identical(other.NIP, NIP) || other.NIP == NIP) &&
             (identical(other.EmployeeName, EmployeeName) ||
                 other.EmployeeName == EmployeeName) &&
@@ -351,8 +345,8 @@ class _$UserImpl extends _User {
   int get hashCode => Object.hash(
       runtimeType,
       id,
-      username,
       uid,
+      C_BPartner_ID,
       NIP,
       EmployeeName,
       DoH,
@@ -366,73 +360,61 @@ class _$UserImpl extends _User {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$UserImplCopyWith<_$UserImpl> get copyWith =>
-      __$$UserImplCopyWithImpl<_$UserImpl>(this, _$identity);
+  _$$UserModelImplCopyWith<_$UserModelImpl> get copyWith =>
+      __$$UserModelImplCopyWithImpl<_$UserModelImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$UserImplToJson(
+    return _$$UserModelImplToJson(
       this,
     );
   }
 }
 
-abstract class _User extends User {
-  factory _User(
-      {@HiveField(0) final int? id,
-      @HiveField(1) final String? username,
-      @HiveField(2) final String? uid,
-      @HiveField(3) final String? NIP,
-      @HiveField(4) final String? EmployeeName,
-      @HiveField(5) final String? DoH,
-      @HiveField(6) final String? Office,
-      @HiveField(7) final String? Department,
-      @HiveField(8) final String? Position,
-      @HiveField(9) final String? model_name,
-      @HiveField(10) final List<double>? embeddings,
-      @HiveField(11) final double? distance}) = _$UserImpl;
-  _User._() : super._();
+abstract class _UserModel implements UserModel {
+  const factory _UserModel(
+      {required final int? id,
+      required final String? uid,
+      required final C_BPartner_IDModel? C_BPartner_ID,
+      required final String? NIP,
+      required final String? EmployeeName,
+      required final String? DoH,
+      required final String? Office,
+      required final String? Department,
+      required final String? Position,
+      required final String? model_name,
+      required final List<double>? embeddings,
+      required final double? distance}) = _$UserModelImpl;
 
-  factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
+  factory _UserModel.fromJson(Map<String, dynamic> json) =
+      _$UserModelImpl.fromJson;
 
   @override
-  @HiveField(0)
   int? get id;
   @override
-  @HiveField(1)
-  String? get username;
-  @override
-  @HiveField(2)
   String? get uid;
   @override
-  @HiveField(3)
+  C_BPartner_IDModel? get C_BPartner_ID;
+  @override
   String? get NIP;
   @override
-  @HiveField(4)
   String? get EmployeeName;
   @override
-  @HiveField(5)
   String? get DoH;
   @override
-  @HiveField(6)
   String? get Office;
   @override
-  @HiveField(7)
   String? get Department;
   @override
-  @HiveField(8)
   String? get Position;
   @override
-  @HiveField(9)
   String? get model_name;
   @override
-  @HiveField(10)
   List<double>? get embeddings;
   @override
-  @HiveField(11)
   double? get distance;
   @override
   @JsonKey(ignore: true)
-  _$$UserImplCopyWith<_$UserImpl> get copyWith =>
+  _$$UserModelImplCopyWith<_$UserModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

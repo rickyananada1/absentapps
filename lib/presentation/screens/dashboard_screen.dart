@@ -5,6 +5,7 @@ import 'package:nb_utils/nb_utils.dart';
 import '../../utils/colors.dart';
 import '../fragment/activity_fragment.dart';
 import '../fragment/home_fragment.dart';
+import '../fragment/profile_fragment.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -22,7 +23,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     const Scaffold(),
     const ActivityFragment(),
     const Scaffold(),
-    const Scaffold(),
+    const ProfileFragment(),
   ];
 
   @override
@@ -34,6 +35,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      _pageController.jumpToPage(index);
     });
   }
 

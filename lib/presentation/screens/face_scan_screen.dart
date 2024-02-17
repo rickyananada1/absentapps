@@ -2,10 +2,8 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:lottie/lottie.dart';
 
-import '../../services/ml_service.dart';
 import '../controllers/face_scan_controller.dart';
 
 List<CameraDescription>? cameras;
@@ -22,8 +20,6 @@ class _FaceScanScreenState extends State<FaceScanScreen> {
   late CameraController _cameraController;
   bool isControllerInitialized = false;
   bool flash = false;
-  late FaceDetector faceDetector;
-  late MLService mlService;
 
   Future initializeCamera() async {
     cameras = await availableCameras();
@@ -44,13 +40,8 @@ class _FaceScanScreenState extends State<FaceScanScreen> {
 
   @override
   void initState() {
-    initializeCamera();
-    final options = FaceDetectorOptions(
-      performanceMode: FaceDetectorMode.accurate,
-    );
-    faceDetector = FaceDetector(options: options);
-    mlService = MLService();
     super.initState();
+    initializeCamera();
   }
 
   @override

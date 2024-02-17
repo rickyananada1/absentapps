@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../presentation/screens/attendance_screen.dart';
 import '../../presentation/screens/dashboard_screen.dart';
 import '../../presentation/screens/face_scan_screen.dart';
 import '../../presentation/screens/login_screen.dart';
 import '../../presentation/screens/on_boarding_screen.dart';
 import '../../presentation/screens/splash_screen.dart';
+import '../../presentation/screens/success_screen.dart';
 import '../../store/AppStore.dart';
 import '../../utils/app_theme.dart';
 
@@ -32,6 +34,8 @@ class App extends StatelessWidget {
         GetPage(name: '/login', page: () => const LoginScreen()),
         GetPage(name: '/face_scan', page: () => const FaceScanScreen()),
         GetPage(name: '/dashboard', page: () => const DashboardScreen()),
+        GetPage(name: '/attendance', page: () => const AttendanceScreen()),
+        GetPage(name: '/success', page: () => const SuccessScreen()),
       ],
     );
   }
