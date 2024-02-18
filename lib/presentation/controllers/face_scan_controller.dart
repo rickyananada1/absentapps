@@ -21,6 +21,7 @@ class FaceScanController extends GetxController {
   Rxn<File> image = Rxn<File>();
   late FaceDetector faceDetector;
   late MLService mlService;
+  RxBool isLoading = false.obs;
 
   @override
   void onInit() {
@@ -33,6 +34,7 @@ class FaceScanController extends GetxController {
   }
 
   Future<void> doFaceDetection() async {
+    isLoading.value = true;
     if (image.value != null) {
       File? _image = await removeRotation(image.value!);
       final Uint8List bytes = await _image.readAsBytes();
@@ -40,6 +42,11 @@ class FaceScanController extends GetxController {
 
       InputImage inputImage = InputImage.fromFile(_image);
       faces.value = await faceDetector.processImage(inputImage);
+
+      if (faces.isEmpty) {
+        Get.snackbar("No Face Detected", "Please try again",
+            backgroundColor: Colors.red, colorText: Colors.white);
+      }
 
       for (Face face in faces) {
         final Rect faceRect = face.boundingBox;
@@ -77,6 +84,7 @@ class FaceScanController extends GetxController {
         }
       }
     }
+    isLoading.value = false;
   }
 
   Future<File> removeRotation(File inputImage) async {

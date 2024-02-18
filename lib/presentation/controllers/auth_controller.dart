@@ -8,9 +8,11 @@ import '../../data/repository/auth_repository.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/entities/user_model.dart';
 import '../../utils/local_db.dart';
+import 'activity_controller.dart';
 
 class AuthController extends GetxController {
   final _apiProvider = serviceLocator<AuthRepository>();
+  final ActivityController activityController = Get.put(ActivityController());
 
   final RxBool isLoading = false.obs;
   final Rx<UserModel?> user = Rx<UserModel?>(null);
@@ -24,7 +26,6 @@ class AuthController extends GetxController {
   Future<void> login(String username, String password) async {
     isLoading.value = true;
     final response = await _apiProvider.login(username, password);
-    isLoading.value = false;
     response.fold(
       (failure) async {
         Get.defaultDialog(
@@ -41,12 +42,27 @@ class AuthController extends GetxController {
         setValue('TOKEN', data.data['data']['access_token']);
         setValue('USER_ID', data.data['data']['userId'].toString());
         await getProfile();
-        // check if user exists in local db
-        // if not, save user to local db
-        await checkUser();
-        Get.offNamed('/face_scan');
+        var userExists = await LocalDb()
+            .getUser(getStringAsync('USER_ID', defaultValue: ''));
+        if (userExists != null) {
+          await checkLastActivity();
+          Get.offNamed('/face_scan');
+        } else {
+          await LocalDb().saveUser(
+            User(
+              NIP: user.value!.NIP,
+              EmployeeName: user.value!.EmployeeName,
+              embeddings: null,
+              C_BPartner_ID: user.value!.C_BPartner_ID!.id.toString(),
+              fingerType: 'In',
+            ),
+            getStringAsync('USER_ID', defaultValue: ''),
+          );
+          Get.offNamed('/face_register');
+        }
       },
     );
+    isLoading.value = false;
   }
 
   Future<void> getProfile() async {
@@ -100,31 +116,41 @@ class AuthController extends GetxController {
     if (token.isNotEmpty) {
       serviceLocator<Request>().updateAuthorization(token);
       await getProfile();
+      return token.isNotEmpty;
     }
-    return token.isNotEmpty;
+    return false;
   }
 
-  Future<void> checkUser() async {
-    var userExists =
-        await LocalDb().getUser(getStringAsync('USER_ID', defaultValue: ''));
-    if (userExists == null) {
+  Future<void> checkLastActivity() async {
+    await activityController.fetchActivities();
+    var lastActivity = activityController.activities.last;
+    var now = DateTime.now();
+    var lastActivityDate = lastActivity.DateFinger!;
+    if (lastActivityDate.day != now.day) {
+      var user =
+          await LocalDb().getUser(getStringAsync('USER_ID', defaultValue: ''));
       await LocalDb().saveUser(
           User(
-            NIP: user.value!.NIP,
-            EmployeeName: user.value!.EmployeeName,
-            embeddings: null,
-            C_BPartner_ID: user.value!.C_BPartner_ID!.id.toString(),
+            NIP: user!.NIP,
+            EmployeeName: user.EmployeeName,
+            embeddings: user.embeddings,
+            C_BPartner_ID: user.C_BPartner_ID,
+            fingerType: 'In',
           ),
           getStringAsync('USER_ID', defaultValue: ''));
     } else {
+      var user =
+          await LocalDb().getUser(getStringAsync('USER_ID', defaultValue: ''));
       await LocalDb().saveUser(
-          User(
-            NIP: user.value!.NIP,
-            EmployeeName: user.value!.EmployeeName,
-            embeddings: userExists.embeddings,
-            C_BPartner_ID: user.value!.C_BPartner_ID!.id.toString(),
-          ),
-          getStringAsync('USER_ID', defaultValue: ''));
+        User(
+          NIP: user!.NIP,
+          EmployeeName: user.EmployeeName,
+          embeddings: user.embeddings,
+          C_BPartner_ID: user.C_BPartner_ID,
+          fingerType: lastActivity.FingerType!.identifier,
+        ),
+        getStringAsync('USER_ID', defaultValue: ''),
+      );
     }
   }
 }

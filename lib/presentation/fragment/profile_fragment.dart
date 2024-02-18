@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
 
-import '../../app/view/app.dart';
 import '../../utils/colors.dart';
 import '../../utils/common.dart';
 import '../../utils/images.dart';
@@ -79,7 +79,8 @@ class _ProfileFragmentState extends State<ProfileFragment>
                 SettingItemWidget(
                   leading: settingIconWidget(icon: Icons.person),
                   title: authController.user.value!.Position!,
-                  subTitle: authController.user.value!.DoH!,
+                  subTitle: DateFormat('dd MMM yyyy')
+                      .format(DateTime.parse(authController.user.value!.DoH!)),
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 ),
@@ -139,25 +140,6 @@ class _ProfileFragmentState extends State<ProfileFragment>
                   onTap: () {
                     toast("Notification");
                   },
-                ),
-                SettingItemWidget(
-                  leading: settingIconWidget(icon: Icons.dark_mode),
-                  title: "App Theme",
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  trailing: SizedBox(
-                    height: 20,
-                    width: 30,
-                    child: Switch(
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      value: appStore.isDarkModeOn.value,
-                      onChanged: (bool value) {
-                        setState(() {
-                          appStore.toggleDarkMode(value: value);
-                        });
-                      },
-                    ),
-                  ),
                 ),
                 Align(
                   alignment: Alignment.topLeft,

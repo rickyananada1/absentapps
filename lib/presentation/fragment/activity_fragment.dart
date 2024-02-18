@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:nb_utils/nb_utils.dart';
 
+import '../../domain/entities/activity_model.dart';
 import '../../utils/colors.dart';
 import '../component/activity_component.dart';
 import '../controllers/activity_controller.dart';
@@ -21,10 +22,16 @@ class _ActivityFragmentState extends State<ActivityFragment>
   bool get wantKeepAlive => true;
   final ActivityController activityController = Get.put(ActivityController());
   final List<String> navs = ['Harian', 'Mingguan', 'Bulanan'];
-  late String currentNav = navs[0];
+  List<Activity> activities = [];
 
-  int currentMonth = DateTime.now().month;
-  int currentYear = DateTime.now().year;
+  @override
+  void initState() {
+    super.initState();
+    activityController.fetchActivities();
+    setState(() {
+      activities = activityController.activities;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +58,8 @@ class _ActivityFragmentState extends State<ActivityFragment>
                     InkWell(
                       onTap: () {
                         setState(() {
-                          currentNav = nav;
+                          activityController.selectedNav.value =
+                              navs.indexOf(nav);
                         });
                       },
                       child: Container(
@@ -59,7 +67,8 @@ class _ActivityFragmentState extends State<ActivityFragment>
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8.0),
                           border: Border.all(
-                            color: currentNav == nav
+                            color: activityController.selectedNav.value ==
+                                    navs.indexOf(nav)
                                 ? appColorPrimary
                                 : Colors.transparent,
                             width: 2,
@@ -73,7 +82,8 @@ class _ActivityFragmentState extends State<ActivityFragment>
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: currentNav == nav
+                              color: activityController.selectedNav.value ==
+                                      navs.indexOf(nav)
                                   ? Colors.black
                                   : Colors.grey,
                             ),
@@ -81,11 +91,14 @@ class _ActivityFragmentState extends State<ActivityFragment>
                         ),
                       ),
                     ),
-                  Card(
+                  Container(
                     margin: const EdgeInsets.only(left: 2.5, right: 2.5),
-                    shape: RoundedRectangleBorder(
+                    decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8.0),
-                      side: const BorderSide(color: Colors.green, width: 1),
+                      border: Border.all(
+                        color: grey.withOpacity(0.5),
+                        width: 1,
+                      ),
                     ),
                     child: InkWell(
                       onTap: () {
@@ -140,12 +153,11 @@ class _ActivityFragmentState extends State<ActivityFragment>
                       IconButton(
                         onPressed: () {
                           setState(() {
-                            if (currentMonth == 1) {
-                              currentMonth = 12;
-                              currentYear--;
-                            } else {
-                              currentMonth--;
-                            }
+                            activityController.currentMonth.value == 1
+                                ? activityController.currentMonth.value = 12
+                                : activityController.currentMonth.value--;
+                            // filter berdasarkan bulan dan tahun
+                            filterActivities();
                           });
                         },
                         icon: const Icon(
@@ -161,8 +173,9 @@ class _ActivityFragmentState extends State<ActivityFragment>
                           ),
                           const SizedBox(width: 5),
                           Text(
-                            DateFormat('MMMM')
-                                .format(DateTime(currentYear, currentMonth)),
+                            DateFormat('MMMM').format(DateTime(
+                                activityController.currentYear.value,
+                                activityController.currentMonth.value)),
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
@@ -170,7 +183,7 @@ class _ActivityFragmentState extends State<ActivityFragment>
                           ),
                           const SizedBox(width: 5),
                           Text(
-                            currentYear.toString(),
+                            activityController.currentYear.value.toString(),
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
@@ -181,12 +194,11 @@ class _ActivityFragmentState extends State<ActivityFragment>
                       IconButton(
                         onPressed: () {
                           setState(() {
-                            if (currentMonth == 12) {
-                              currentMonth = 1;
-                              currentYear++;
-                            } else {
-                              currentMonth++;
-                            }
+                            activityController.currentMonth.value == 12
+                                ? activityController.currentMonth.value = 1
+                                : activityController.currentMonth.value++;
+                            // filter berdasarkan bulan dan tahun
+                            filterActivities();
                           });
                         },
                         icon: const Icon(
@@ -200,33 +212,50 @@ class _ActivityFragmentState extends State<ActivityFragment>
               ),
               const SizedBox(height: 20),
               Obx(
-                () => activityController.activities.isEmpty
+                () => activityController.isLoading.value
                     ? Center(
                         child: LoadingAnimationWidget.staggeredDotsWave(
                           color: appColorPrimary,
                           size: 30,
                         ),
                       )
-                    : Expanded(
-                        child: ListView.builder(
-                          itemCount: activityController.activities.length,
-                          itemBuilder: (context, index) {
-                            var date = activityController
-                                .activities[index].DateFinger!;
-                            var type = activityController
-                                .activities[index].FingerType!.identifier!;
-                            return ActivityComponent(
-                              date: date,
-                              type: type,
-                            );
-                          },
-                        ),
-                      ),
+                    : activities.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'Tidak ada data',
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 16,
+                              ),
+                            ),
+                          )
+                        : Expanded(
+                            child: ListView.builder(
+                              itemCount: activities.length,
+                              itemBuilder: (context, index) {
+                                var date = activities[index].DateFinger!;
+                                var type =
+                                    activities[index].FingerType!.identifier!;
+                                return ActivityComponent(
+                                  date: date,
+                                  type: type,
+                                );
+                              },
+                            ),
+                          ),
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void filterActivities() {
+    activities = activityController.activities.where((element) {
+      return element.DateFinger!.month ==
+              activityController.currentMonth.value &&
+          element.DateFinger!.year == activityController.currentYear.value;
+    }).toList();
   }
 }

@@ -25,11 +25,11 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          child: Stack(
-            children: [
-              Column(
+      body: SafeArea(
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
@@ -199,22 +199,22 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ],
               ),
-              Obx(
-                () => Visibility(
-                  visible: authController.isLoading.value,
-                  child: Container(
-                    color: Colors.black.withOpacity(0.5),
-                    child: Center(
-                      child: LoadingAnimationWidget.staggeredDotsWave(
-                        color: Colors.white,
-                        size: 30,
-                      ),
+            ),
+            Obx(
+              () => Visibility(
+                visible: authController.isLoading.value,
+                child: Container(
+                  color: Colors.white,
+                  child: Center(
+                    child: LoadingAnimationWidget.staggeredDotsWave(
+                      color: appColorPrimary,
+                      size: 30,
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

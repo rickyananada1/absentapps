@@ -13,10 +13,13 @@ class User extends HiveObject {
   List<double>? embeddings;
   @HiveField(3)
   String? C_BPartner_ID;
+  String? fingerType;
 
-  User(
-      {required this.NIP,
-      required this.EmployeeName,
-      required this.embeddings,
-      required this.C_BPartner_ID});
+  User({
+    required this.NIP,
+    required this.EmployeeName,
+    required this.embeddings,
+    required this.C_BPartner_ID,
+    this.fingerType,
+  });
 }

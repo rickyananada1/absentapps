@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nb_utils/nb_utils.dart';
 
+import '../../app/app.dart';
 import '../../utils/colors.dart';
 import '../fragment/activity_fragment.dart';
 import '../fragment/home_fragment.dart';
@@ -55,33 +56,46 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   BottomNavigationBar _bottomTab() {
     return BottomNavigationBar(
-      items: const <BottomNavigationBarItem>[
+      items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.home_outlined, color: Colors.grey),
+          icon: const Icon(Icons.home_outlined, color: Colors.grey),
           label: 'Beranda',
-          activeIcon: Icon(Icons.home_outlined, color: appColorPrimary),
+          activeIcon: Icon(
+            Icons.home_outlined,
+            color: appStore.isDarkModeOn.value ? white : appColorPrimary,
+          ),
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.alarm_outlined, color: Colors.grey),
+          icon: const Icon(Icons.alarm_outlined, color: Colors.grey),
           label: 'Jadwal',
-          activeIcon: Icon(Icons.alarm_outlined, color: appColorPrimary),
+          activeIcon: Icon(
+            Icons.alarm_outlined,
+            color: appStore.isDarkModeOn.value ? white : appColorPrimary,
+          ),
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.calendar_month_outlined, color: Colors.grey),
+          icon: const Icon(Icons.calendar_month_outlined, color: Colors.grey),
           label: 'Aktivitas',
-          activeIcon:
-              Icon(Icons.calendar_month_outlined, color: appColorPrimary),
+          activeIcon: Icon(
+            Icons.calendar_month_outlined,
+            color: appStore.isDarkModeOn.value ? white : appColorPrimary,
+          ),
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.notifications_outlined, color: Colors.grey),
+          icon: const Icon(Icons.notifications_outlined, color: Colors.grey),
           label: 'Notifikasi',
-          activeIcon:
-              Icon(Icons.notifications_outlined, color: appColorPrimary),
+          activeIcon: Icon(
+            Icons.notifications_outlined,
+            color: appStore.isDarkModeOn.value ? white : appColorPrimary,
+          ),
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline, color: Colors.grey),
+          icon: const Icon(Icons.person_outline, color: Colors.grey),
           label: 'Profil',
-          activeIcon: Icon(FontAwesomeIcons.user, color: appColorPrimary),
+          activeIcon: Icon(
+            FontAwesomeIcons.user,
+            color: appStore.isDarkModeOn.value ? white : appColorPrimary,
+          ),
         ),
       ],
       currentIndex: _selectedIndex,

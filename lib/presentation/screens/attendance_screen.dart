@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../utils/colors.dart';
 import '../controllers/attendance_controller.dart';
 
 late List<CameraDescription>? cameras;
@@ -126,6 +128,20 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                       height: 30,
                     ),
                   ],
+                ),
+              ),
+            ),
+            Obx(
+              () => Visibility(
+                visible: attendanceController.isLoading.value,
+                child: Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: Center(
+                    child: LoadingAnimationWidget.staggeredDotsWave(
+                      color: appColorPrimary,
+                      size: 30,
+                    ),
+                  ),
                 ),
               ),
             ),

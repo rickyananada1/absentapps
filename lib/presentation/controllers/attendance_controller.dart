@@ -11,6 +11,7 @@ import 'package:nb_utils/nb_utils.dart';
 import '../../core/service_locator.dart';
 import '../../data/repository/activity_repository.dart';
 
+import '../../domain/entities/user.dart';
 import '../../domain/entities/working_location_model.dart';
 import '../../services/ml_service.dart';
 import '../../utils/local_db.dart';
@@ -28,6 +29,7 @@ class AttendanceController extends GetxController {
   late Position currentLocation;
   bool isMatched = false;
   double distanceInMeters = 0;
+  RxBool isLoading = false.obs;
 
   @override
   void onInit() {
@@ -54,6 +56,12 @@ class AttendanceController extends GetxController {
 
       InputImage inputImage = InputImage.fromFile(_image);
       faces.value = await faceDetector.processImage(inputImage);
+
+      if (faces.isEmpty) {
+        Get.snackbar("No Face Detected", "Please try again",
+            backgroundColor: Colors.red, colorText: Colors.white);
+        isLoading.value = false;
+      }
 
       for (Face face in faces) {
         final Rect faceRect = face.boundingBox;
@@ -102,10 +110,28 @@ class AttendanceController extends GetxController {
   }
 
   Future<void> postAttendance() async {
+    isLoading.value = true;
     await doFaceDetection();
     if (!isMatched) {
       Get.snackbar('Error', 'Face not matched',
           backgroundColor: Colors.red, colorText: Colors.white);
+      isLoading.value = false;
+      return;
+    }
+    bool serviceEnabled;
+    LocationPermission permission;
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      Get.snackbar('Error', 'Location services are disabled',
+          backgroundColor: Colors.red, colorText: Colors.white);
+      isLoading.value = false;
+      return;
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.deniedForever) {
+      Get.snackbar('Error', 'Location permissions are permanently denied',
+          backgroundColor: Colors.red, colorText: Colors.white);
+      isLoading.value = false;
       return;
     }
     for (WorkingLocation location in workingLocations) {
@@ -116,16 +142,17 @@ class AttendanceController extends GetxController {
         location.Longitude!.toDouble(),
       );
 
-      // if (distanceInMeters < location.Radius!) {
-      //   inLocation.value = true;
-      //   break;
-      // }
+      if (distanceInMeters < location.Radius!) {
+        inLocation.value = true;
+        break;
+      }
     }
-    // if (!inLocation.value) {
-    //   Get.snackbar('Error', 'You are not in the working location',
-    //       backgroundColor: Colors.red, colorText: Colors.white);
-    //   return;
-    // }
+    if (!inLocation.value) {
+      Get.snackbar('Error', 'You are not in the working location',
+          backgroundColor: Colors.red, colorText: Colors.white);
+      isLoading.value = false;
+      return;
+    }
     var now = DateTime.now();
     var user =
         await LocalDb().getUser(getStringAsync('USER_ID', defaultValue: ''));
@@ -135,13 +162,40 @@ class AttendanceController extends GetxController {
       currentLocation.latitude,
       currentLocation.longitude,
       5,
-      getBoolAsync('FINGER_TYPE', defaultValue: false) ? 'In' : 'Out',
+      user.fingerType == null ? 'In' : user.fingerType!,
     );
+    response.fold(
+      (failure) {
+        Get.snackbar('Error', failure.message);
+      },
+      (data) async {
+        var message = await setMessage(now, user);
+        await LocalDb().saveUser(
+          User(
+            NIP: user.NIP,
+            EmployeeName: user.EmployeeName,
+            fingerType: user.fingerType == 'In' ? 'Out' : 'In',
+            C_BPartner_ID: user.C_BPartner_ID,
+            embeddings: user.embeddings,
+          ),
+          getStringAsync('USER_ID', defaultValue: ''),
+        );
+        await homeController.getFingerType();
+        Get.offAndToNamed('/success', arguments: {
+          'title': 'PRESENSI BERHASIL!',
+          'message': message,
+        });
+      },
+    );
+    isLoading.value = false;
+  }
+
+  Future<String> setMessage(var now, var user) async {
     // ambil waktu terlambat
     var late = DateTime(now.year, now.month, now.day, 19, 0, 0);
     var lateDuration = now.difference(late).inMinutes;
     var message = '';
-    if (!getBoolAsync('FINGER_TYPE', defaultValue: false)) {
+    if (user.fingerType == 'In') {
       message +=
           'Anda baru saja melakukan Presensi Masuk pada jam ${now.hour}:${now.minute} WIB\n';
       if (lateDuration > 0) {
@@ -153,22 +207,6 @@ class AttendanceController extends GetxController {
       message =
           'Anda baru saja melakukan Presensi Pulang pada jam ${now.hour}:${now.minute} WIB';
     }
-
-    response.fold(
-      (failure) {
-        Get.snackbar('Error', failure.message);
-      },
-      (data) {
-        setValue(
-            'FINGER_TYPE', !getBoolAsync('FINGER_TYPE', defaultValue: false));
-        homeController.fingerType.value =
-            getBoolAsync('FINGER_TYPE', defaultValue: false);
-        Get.back();
-        Get.toNamed('/success', arguments: {
-          'title': 'PRESENSI BERHASIL!',
-          'message': message,
-        });
-      },
-    );
+    return message;
   }
 }

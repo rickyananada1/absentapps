@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../presentation/screens/attendance_screen.dart';
 import '../../presentation/screens/dashboard_screen.dart';
+import '../../presentation/screens/face_register_screen.dart';
 import '../../presentation/screens/face_scan_screen.dart';
 import '../../presentation/screens/login_screen.dart';
 import '../../presentation/screens/on_boarding_screen.dart';
@@ -32,6 +33,7 @@ class App extends StatelessWidget {
         GetPage(name: '/splash', page: () => const SplashScreen()),
         GetPage(name: '/onboarding', page: () => const OnBoardingScreen()),
         GetPage(name: '/login', page: () => const LoginScreen()),
+        GetPage(name: '/face_register', page: () => const FaceRegisterScreen()),
         GetPage(name: '/face_scan', page: () => const FaceScanScreen()),
         GetPage(name: '/dashboard', page: () => const DashboardScreen()),
         GetPage(name: '/attendance', page: () => const AttendanceScreen()),
