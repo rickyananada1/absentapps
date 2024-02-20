@@ -152,14 +152,16 @@ class ApiProvider {
     );
   }
 
-  Future<Either<Failure, List<Activity>>> getActivities() async {
+  Future<Either<Failure, List<Activity>>> getActivities(String? query) async {
     const path = Strings.activitiesEndpoint;
-    Map<String, dynamic> query = {
-      'select':
+
+    Map<String, dynamic> buildQuery = {
+      '\$select':
           'DateFinger,HR_Location_ID,Latitude,Longitude,Distance,FingerType',
+      '\$filter': query,
     };
     return await handleApiResponse(
-      () => request.get(path, queryParameters: query),
+      () => request.get(path, queryParameters: buildQuery),
       (data) {
         List<Activity> activities = [];
         for (var item in data['records']) {

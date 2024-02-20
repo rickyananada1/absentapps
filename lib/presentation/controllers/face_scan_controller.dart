@@ -69,6 +69,7 @@ class FaceScanController extends GetxController {
 
         User? user = await LocalDb()
             .getUser(getStringAsync('USER_ID', defaultValue: ''));
+
         if (user!.embeddings == null) {
           showFaceRegistrationDialogue(cropedFace);
         } else {
@@ -152,7 +153,10 @@ class FaceScanController extends GetxController {
                   }
                   // convert image to binary and save in db
                   String bytes = base64Encode(img.encodeJpg(cropedFace));
+                  isLoading.value = true;
+                  Get.back();
                   await authController.postImages(bytes, user);
+                  isLoading.value = false;
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,

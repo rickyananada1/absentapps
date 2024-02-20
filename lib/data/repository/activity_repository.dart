@@ -11,8 +11,8 @@ class ActivityRepository {
   ActivityRepository({required ApiProvider apiProvider})
       : _apiProvider = apiProvider;
 
-  Future<Either<Failure, List<Activity>>> getActivities() async {
-    return await _apiProvider.getActivities();
+  Future<Either<Failure, List<Activity>>> getActivities(String? query) async {
+    return await _apiProvider.getActivities(query);
   }
 
   Future<Either<Failure, List<WorkingLocation>>> getWorkingLocations() async {

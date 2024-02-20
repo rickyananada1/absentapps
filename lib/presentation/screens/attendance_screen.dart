@@ -49,6 +49,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   @override
+  void dispose() {
+    _cameraController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(

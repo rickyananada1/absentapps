@@ -15,11 +15,13 @@ import '../../domain/entities/user.dart';
 import '../../domain/entities/working_location_model.dart';
 import '../../services/ml_service.dart';
 import '../../utils/local_db.dart';
+import 'activity_controller.dart';
 import 'home_controller.dart';
 
 class AttendanceController extends GetxController {
   final _apiProvider = serviceLocator<ActivityRepository>();
   final HomeController homeController = Get.put(HomeController());
+  final ActivityController activityController = Get.put(ActivityController());
   RxList<Face> faces = <Face>[].obs;
   Rxn<File> image = Rxn<File>();
   late FaceDetector faceDetector;
@@ -181,6 +183,7 @@ class AttendanceController extends GetxController {
           getStringAsync('USER_ID', defaultValue: ''),
         );
         await homeController.getFingerType();
+        await activityController.fetchActivities();
         Get.offAndToNamed('/success', arguments: {
           'title': 'PRESENSI BERHASIL!',
           'message': message,
