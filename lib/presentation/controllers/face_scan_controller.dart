@@ -22,6 +22,7 @@ class FaceScanController extends GetxController {
   late FaceDetector faceDetector;
   late MLService mlService;
   RxBool isLoading = false.obs;
+  bool isMatched = false;
 
   @override
   void onInit() {
@@ -35,65 +36,36 @@ class FaceScanController extends GetxController {
 
   Future<void> doFaceDetection() async {
     isLoading.value = true;
-    if (image.value != null) {
-      File? _image = await removeRotation(image.value!);
-      final Uint8List bytes = await _image.readAsBytes();
-      final img.Image capturedImage = img.decodeImage(bytes)!;
 
-      InputImage inputImage = InputImage.fromFile(_image);
-      faces.value = await faceDetector.processImage(inputImage);
-
-      if (faces.isEmpty) {
-        Get.snackbar("No Face Detected", "Please try again",
+    Future.wait([
+      mlService.doFaceDetection(image.value!),
+      LocalDb().getUser(getStringAsync('USER_ID', defaultValue: ''))
+    ]).then((value) async {
+      if (mlService.faces.isEmpty) {
+        isLoading.value = false;
+        Get.snackbar('Error', 'No face detected',
             backgroundColor: Colors.red, colorText: Colors.white);
+        return;
       }
 
-      for (Face face in faces) {
-        final Rect faceRect = face.boundingBox;
-        num left = faceRect.left < 0 ? 0 : faceRect.left;
-        num top = faceRect.top < 0 ? 0 : faceRect.top;
-        num right = faceRect.right > capturedImage.width
-            ? capturedImage.width - 1
-            : faceRect.right;
-        num bottom = faceRect.bottom > capturedImage.height
-            ? capturedImage.height - 1
-            : faceRect.bottom;
-        num width = right - left;
-        num height = bottom - top;
+      User? user = value[1] as User?;
 
-        final img.Image cropedFace = img.copyCrop(capturedImage,
-            x: left.toInt(),
-            y: top.toInt(),
-            width: width.toInt(),
-            height: height.toInt());
-
-        User? user = await LocalDb()
-            .getUser(getStringAsync('USER_ID', defaultValue: ''));
-
-        if (user!.embeddings == null) {
-          showFaceRegistrationDialogue(cropedFace);
+      if (user!.embeddings == null) {
+        showFaceRegistrationDialogue(mlService.cropedFace!);
+      } else {
+        isMatched = await mlService.compareFaces(mlService.cropedFace!);
+        if (isMatched) {
+          Get.snackbar("Face Matched", "Face Matched",
+              backgroundColor: Colors.green, colorText: Colors.white);
+          Get.offNamed('/dashboard');
         } else {
-          bool isMatched = await mlService.compareFaces(cropedFace);
-          if (isMatched) {
-            Get.snackbar("Face Matched", "Face Matched",
-                backgroundColor: Colors.green, colorText: Colors.white);
-            Get.offNamed('/dashboard');
-          } else {
-            Get.snackbar("Face Not Matched", "Face Not Matched",
-                backgroundColor: Colors.red, colorText: Colors.white);
-          }
+          Get.snackbar("Face Not Matched", "Face Not Matched",
+              backgroundColor: Colors.red, colorText: Colors.white);
         }
       }
-    }
-    isLoading.value = false;
-  }
 
-  Future<File> removeRotation(File inputImage) async {
-    final img.Image? capturedImage =
-        img.decodeImage(await File(inputImage.path).readAsBytes());
-    final img.Image orientedImage = img.bakeOrientation(capturedImage!);
-    return await File(inputImage.path)
-        .writeAsBytes(img.encodeJpg(orientedImage));
+      isLoading.value = false;
+    });
   }
 
   void showFaceRegistrationDialogue(img.Image cropedFace) async {

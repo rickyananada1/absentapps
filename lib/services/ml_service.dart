@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
+import 'dart:ui';
 
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as img;
@@ -11,7 +14,12 @@ import '../utils/local_db.dart';
 class MLService {
   late Interpreter interpreter;
   late InterpreterOptions _interpreterOptions;
+  late FaceDetector faceDetector;
+  List<Face> faces = [];
+  File? image;
   User? user;
+  img.Image? capturedImage;
+  img.Image? cropedFace;
 
   String get modelName => 'assets/mobilefacenet.tflite';
 
@@ -20,6 +28,10 @@ class MLService {
     if (numThreads != null) {
       _interpreterOptions.threads = numThreads;
     }
+    final options = FaceDetectorOptions(
+      performanceMode: FaceDetectorMode.accurate,
+    );
+    faceDetector = FaceDetector(options: options);
     loadModel();
     initialize();
   }
@@ -103,5 +115,49 @@ class MLService {
       sum += diff * diff;
     }
     return sqrt(sum);
+  }
+
+  Future<void> doFaceDetection(File? image) async {
+    File? _image = await removeRotation(image!);
+    final Uint8List bytes = await _image.readAsBytes();
+    final capturedImage = img.decodeImage(bytes)!;
+
+    InputImage inputImage = InputImage.fromFile(_image);
+
+    faces = await faceDetector.processImage(inputImage);
+
+    if (faces.isEmpty) {
+      return;
+    }
+
+    for (Face face in faces) {
+      final Rect faceRect = face.boundingBox;
+      num left = faceRect.left < 0 ? 0 : faceRect.left;
+      num top = faceRect.top < 0 ? 0 : faceRect.top;
+      num right = faceRect.right > capturedImage.width
+          ? capturedImage.width - 1
+          : faceRect.right;
+      num bottom = faceRect.bottom > capturedImage.height
+          ? capturedImage.height - 1
+          : faceRect.bottom;
+      num width = right - left;
+      num height = bottom - top;
+
+      cropedFace = img.copyCrop(capturedImage,
+          x: left.toInt(),
+          y: top.toInt(),
+          width: width.toInt(),
+          height: height.toInt());
+
+      return;
+    }
+  }
+
+  Future<File> removeRotation(File inputImage) async {
+    final img.Image? capturedImage =
+        img.decodeImage(await File(inputImage.path).readAsBytes());
+    final img.Image orientedImage = img.bakeOrientation(capturedImage!);
+    return await File(inputImage.path)
+        .writeAsBytes(img.encodeJpg(orientedImage));
   }
 }

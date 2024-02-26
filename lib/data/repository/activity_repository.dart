@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 
 import '../../core/failure.dart';
 import '../../domain/entities/activity_model.dart';
@@ -11,8 +12,10 @@ class ActivityRepository {
   ActivityRepository({required ApiProvider apiProvider})
       : _apiProvider = apiProvider;
 
-  Future<Either<Failure, List<Activity>>> getActivities(String? query) async {
-    return await _apiProvider.getActivities(query);
+  Future<Either<Failure, Response>> getActivities(String? query,
+      {String? orderBy, int? top, int? skip, int? page}) async {
+    return await _apiProvider.getActivities(query,
+        orderBy: orderBy, top: top, skip: skip, page: page);
   }
 
   Future<Either<Failure, List<WorkingLocation>>> getWorkingLocations() async {

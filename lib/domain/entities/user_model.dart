@@ -17,6 +17,7 @@ abstract class UserModel with _$UserModel {
     required String? Office,
     required String? Department,
     required String? Position,
+    required bool? IsAllowFingerfromAnywhere,
     required String? model_name,
     required List<double>? embeddings,
     required double? distance,

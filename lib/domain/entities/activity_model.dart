@@ -15,6 +15,7 @@ abstract class Activity with _$Activity {
     required String? Longitude,
     required double? Distance,
     required FingerTypeModel? FingerType,
+    required String? location,
   }) = _Activity;
 
   factory Activity.fromJson(Map<String, dynamic> json) =>

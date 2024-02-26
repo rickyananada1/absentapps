@@ -115,7 +115,8 @@ class ApiProvider {
   Future<Either<Failure, UserModel>> getProfile(String userId) async {
     var path = '${Strings.profileEndpoint}$userId';
     Map<String, dynamic> query = {
-      'select': 'NIP,EmployeeName,DoH,Office,Department,Position,C_BPartner_ID',
+      'select':
+          'NIP,EmployeeName,DoH,Office,Department,Position,C_BPartner_ID,IsAllowFingerfromAnywhere',
     };
     return await handleApiResponse(
       () => request.get(path, queryParameters: query),
@@ -152,13 +153,18 @@ class ApiProvider {
     );
   }
 
-  Future<Either<Failure, List<Activity>>> getActivities(String? query) async {
+  Future<Either<Failure, Response>> getActivities(String? query,
+      {String? orderBy, int? top, int? skip, int? page}) async {
     const path = Strings.activitiesEndpoint;
 
     Map<String, dynamic> buildQuery = {
       '\$select':
           'DateFinger,HR_Location_ID,Latitude,Longitude,Distance,FingerType',
       '\$filter': query,
+      '\$orderby': orderBy ?? 'DateFinger asc',
+      '\$top': top,
+      '\$skip': skip,
+      '\$page': page
     };
     return await handleApiResponse(
       () => request.get(path, queryParameters: buildQuery),
@@ -167,7 +173,20 @@ class ApiProvider {
         for (var item in data['records']) {
           activities.add(Activity.fromJson(item));
         }
-        return activities;
+        return Response(
+          requestOptions: RequestOptions(
+            path: path,
+            method: 'GET',
+          ),
+          statusCode: 200,
+          statusMessage: 'OK',
+          data: {
+            'status': 'success',
+            'message': 'Data found',
+            'activities': activities,
+            'page-count': data['page-count'],
+          },
+        );
       },
     );
   }

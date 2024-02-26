@@ -23,6 +23,15 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
   @override
+  void initState() {
+    super.initState();
+    if (authController.rememberMe.value) {
+      _usernameController.text = getStringAsync('USERNAME', defaultValue: '');
+      _passwordController.text = getStringAsync('PASSWORD', defaultValue: '');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
@@ -142,15 +151,42 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                             ),
                           ),
+                          // remember me
                           20.height,
-                          const Text(
-                            'Lupa Password?',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: authController.rememberMe.value,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        authController.rememberMe.value =
+                                            value!;
+                                      });
+                                    },
+                                  ),
+                                  const Text(
+                                    'Ingat Saya',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const Text(
+                                'Lupa Password?',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ],
                           ),
                           20.height,
                           SizedBox(

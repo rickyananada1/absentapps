@@ -8,18 +8,18 @@ import '../../data/repository/auth_repository.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/entities/user_model.dart';
 import '../../utils/local_db.dart';
-import 'activity_controller.dart';
 
 class AuthController extends GetxController {
   final _apiProvider = serviceLocator<AuthRepository>();
-  final ActivityController activityController = Get.put(ActivityController());
 
   final RxBool isLoading = false.obs;
+  final RxBool rememberMe = false.obs;
   final Rx<UserModel?> user = Rx<UserModel?>(null);
 
   @override
   void onInit() {
     isLoading.value = false;
+    rememberMe.value = getBoolAsync('REMEMBER_ME', defaultValue: false);
     super.onInit();
   }
 
@@ -41,11 +41,19 @@ class AuthController extends GetxController {
             .updateAuthorization(data.data['data']['access_token']);
         setValue('TOKEN', data.data['data']['access_token']);
         setValue('USER_ID', data.data['data']['userId'].toString());
+        if (rememberMe.value) {
+          setValue('REMEMBER_ME', true);
+          setValue('USERNAME', username);
+          setValue('PASSWORD', password);
+        } else {
+          setValue('REMEMBER_ME', false);
+          setValue('USERNAME', '');
+          setValue('PASSWORD', '');
+        }
         await getProfile();
         var userExists = await LocalDb()
             .getUser(getStringAsync('USER_ID', defaultValue: ''));
         if (userExists != null) {
-          await checkLastActivity();
           Get.offNamed('/face_scan');
         } else {
           await LocalDb().saveUser(
@@ -54,7 +62,6 @@ class AuthController extends GetxController {
               EmployeeName: user.value!.EmployeeName,
               embeddings: null,
               C_BPartner_ID: user.value!.C_BPartner_ID!.id.toString(),
-              fingerType: 'In',
             ),
             getStringAsync('USER_ID', defaultValue: ''),
           );
@@ -119,38 +126,5 @@ class AuthController extends GetxController {
       return token.isNotEmpty;
     }
     return false;
-  }
-
-  Future<void> checkLastActivity() async {
-    await activityController.fetchActivities();
-    var lastActivity = activityController.activities.last;
-    var now = DateTime.now();
-    var lastActivityDate = lastActivity.DateFinger!;
-    if (lastActivityDate.day != now.day) {
-      var user =
-          await LocalDb().getUser(getStringAsync('USER_ID', defaultValue: ''));
-      await LocalDb().saveUser(
-          User(
-            NIP: user!.NIP,
-            EmployeeName: user.EmployeeName,
-            embeddings: user.embeddings,
-            C_BPartner_ID: user.C_BPartner_ID,
-            fingerType: 'In',
-          ),
-          getStringAsync('USER_ID', defaultValue: ''));
-    } else {
-      var user =
-          await LocalDb().getUser(getStringAsync('USER_ID', defaultValue: ''));
-      await LocalDb().saveUser(
-        User(
-          NIP: user!.NIP,
-          EmployeeName: user.EmployeeName,
-          embeddings: user.embeddings,
-          C_BPartner_ID: user.C_BPartner_ID,
-          fingerType: lastActivity.FingerType!.identifier,
-        ),
-        getStringAsync('USER_ID', defaultValue: ''),
-      );
-    }
   }
 }

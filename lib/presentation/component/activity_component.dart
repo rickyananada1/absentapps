@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
 
+import '../../domain/entities/activity_model.dart';
 import '../../utils/colors.dart';
 
 class ActivityComponent extends StatelessWidget {
   final DateTime date;
-  final String type;
+  final List<Activity> activities;
   const ActivityComponent({
     super.key,
     required this.date,
-    required this.type,
+    required this.activities,
   });
 
   @override
@@ -19,165 +20,105 @@ class ActivityComponent extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        type == 'In'
-            ? Container(
-                margin: const EdgeInsets.all(8.0),
-                height: 70,
-                width: 70,
-                padding: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                  color: appSecondaryBackgroundColor,
+        Container(
+          margin: const EdgeInsets.all(8.0),
+          height: 70,
+          width: 70,
+          padding: const EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10.0),
+            color: appSecondaryBackgroundColor,
+          ),
+          child: Column(
+            children: [
+              Text(
+                date.day.toString(),
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
                 ),
-                child: Column(
-                  children: [
-                    Text(
-                      date.day.toString(),
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    Text(
-                      DateFormat('E').format(date),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                DateFormat('E').format(date),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: activities.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              return Container(
+                margin: const EdgeInsets.symmetric(vertical: 10.0),
+                width: MediaQuery.of(context).size.width * 0.75,
+                padding: const EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.0),
+                  color: white,
+                  // efek shadow tipis
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 1,
+                      blurRadius: 1,
+                      offset: const Offset(0, 1),
                     ),
                   ],
                 ),
-              )
-            : Container(
-                margin: const EdgeInsets.all(8.0),
-                height: 70,
-                width: 70,
-              ),
-        Column(
-          children: [
-            type == 'In'
-                ? Container(
-                    margin: const EdgeInsets.symmetric(vertical: 10.0),
-                    width: MediaQuery.of(context).size.width * 0.75,
-                    padding: const EdgeInsets.all(10.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12.0),
-                      color: white,
-                      // efek shadow tipis
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 1,
-                          blurRadius: 1,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      activities[index].FingerType!.identifier! == 'In'
+                          ? 'Masuk'
+                          : 'Pulang',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(height: 2),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Masuk',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Text(
+                          DateFormat('HH:mm')
+                              .format(activities[index].DateFinger!),
+                          style: const TextStyle(
+                              fontSize: 22, fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 2),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              // '07.59',
-                              DateFormat('HH:mm').format(date),
-                              style: const TextStyle(
-                                  fontSize: 22, fontWeight: FontWeight.bold),
+                            const Icon(
+                              Icons.pin_drop,
+                              size: 18,
+                              color: Colors.red,
                             ),
-                            const Row(
-                              children: [
-                                Icon(
-                                  Icons.pin_drop,
-                                  size: 18,
-                                  color: Colors.red,
-                                ),
-                                SizedBox(width: 3),
-                                Icon(
-                                  Icons.calendar_month,
-                                  size: 18,
-                                  color: Colors.green,
-                                ),
-                                SizedBox(width: 3),
-                                Icon(
-                                  Icons.note_add,
-                                  size: 18,
-                                  color: Colors.grey,
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                  )
-                : Container(
-                    margin: const EdgeInsets.symmetric(vertical: 10.0),
-                    width: MediaQuery.of(context).size.width * 0.75,
-                    padding: const EdgeInsets.all(10.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12.0),
-                      color: white,
-                      // efek shadow tipis
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 1,
-                          blurRadius: 1,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Keluar',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
+                            10.width,
                             Text(
-                              DateFormat('HH:mm').format(date),
+                              activities[index].location ?? 'Unknown',
                               style: const TextStyle(
-                                  fontSize: 22, fontWeight: FontWeight.bold),
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
                             ),
-                            const Row(
-                              children: [
-                                Icon(
-                                  Icons.pin_drop,
-                                  size: 18,
-                                  color: Colors.red,
-                                ),
-                                SizedBox(width: 3),
-                                Icon(
-                                  Icons.note_add,
-                                  size: 18,
-                                  color: Colors.grey,
-                                ),
-                              ],
-                            )
                           ],
-                        ),
+                        )
                       ],
                     ),
-                  ),
-          ],
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ],
     );

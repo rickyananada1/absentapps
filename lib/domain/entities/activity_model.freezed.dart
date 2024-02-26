@@ -27,6 +27,7 @@ mixin _$Activity {
   String? get Longitude => throw _privateConstructorUsedError;
   double? get Distance => throw _privateConstructorUsedError;
   FingerTypeModel? get FingerType => throw _privateConstructorUsedError;
+  String? get location => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -46,7 +47,8 @@ abstract class $ActivityCopyWith<$Res> {
       String? Latitude,
       String? Longitude,
       double? Distance,
-      FingerTypeModel? FingerType});
+      FingerTypeModel? FingerType,
+      String? location});
 
   $FingerTypeModelCopyWith<$Res>? get FingerType;
 }
@@ -71,6 +73,7 @@ class _$ActivityCopyWithImpl<$Res, $Val extends Activity>
     Object? Longitude = freezed,
     Object? Distance = freezed,
     Object? FingerType = freezed,
+    Object? location = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -101,6 +104,10 @@ class _$ActivityCopyWithImpl<$Res, $Val extends Activity>
           ? _value.FingerType
           : FingerType // ignore: cast_nullable_to_non_nullable
               as FingerTypeModel?,
+      location: freezed == location
+          ? _value.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 
@@ -132,7 +139,8 @@ abstract class _$$ActivityImplCopyWith<$Res>
       String? Latitude,
       String? Longitude,
       double? Distance,
-      FingerTypeModel? FingerType});
+      FingerTypeModel? FingerType,
+      String? location});
 
   @override
   $FingerTypeModelCopyWith<$Res>? get FingerType;
@@ -156,6 +164,7 @@ class __$$ActivityImplCopyWithImpl<$Res>
     Object? Longitude = freezed,
     Object? Distance = freezed,
     Object? FingerType = freezed,
+    Object? location = freezed,
   }) {
     return _then(_$ActivityImpl(
       id: freezed == id
@@ -186,6 +195,10 @@ class __$$ActivityImplCopyWithImpl<$Res>
           ? _value.FingerType
           : FingerType // ignore: cast_nullable_to_non_nullable
               as FingerTypeModel?,
+      location: freezed == location
+          ? _value.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -200,7 +213,8 @@ class _$ActivityImpl implements _Activity {
       required this.Latitude,
       required this.Longitude,
       required this.Distance,
-      required this.FingerType});
+      required this.FingerType,
+      required this.location});
 
   factory _$ActivityImpl.fromJson(Map<String, dynamic> json) =>
       _$$ActivityImplFromJson(json);
@@ -219,10 +233,12 @@ class _$ActivityImpl implements _Activity {
   final double? Distance;
   @override
   final FingerTypeModel? FingerType;
+  @override
+  final String? location;
 
   @override
   String toString() {
-    return 'Activity(id: $id, uid: $uid, DateFinger: $DateFinger, Latitude: $Latitude, Longitude: $Longitude, Distance: $Distance, FingerType: $FingerType)';
+    return 'Activity(id: $id, uid: $uid, DateFinger: $DateFinger, Latitude: $Latitude, Longitude: $Longitude, Distance: $Distance, FingerType: $FingerType, location: $location)';
   }
 
   @override
@@ -241,13 +257,15 @@ class _$ActivityImpl implements _Activity {
             (identical(other.Distance, Distance) ||
                 other.Distance == Distance) &&
             (identical(other.FingerType, FingerType) ||
-                other.FingerType == FingerType));
+                other.FingerType == FingerType) &&
+            (identical(other.location, location) ||
+                other.location == location));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, id, uid, DateFinger, Latitude,
-      Longitude, Distance, FingerType);
+      Longitude, Distance, FingerType, location);
 
   @JsonKey(ignore: true)
   @override
@@ -271,7 +289,8 @@ abstract class _Activity implements Activity {
       required final String? Latitude,
       required final String? Longitude,
       required final double? Distance,
-      required final FingerTypeModel? FingerType}) = _$ActivityImpl;
+      required final FingerTypeModel? FingerType,
+      required final String? location}) = _$ActivityImpl;
 
   factory _Activity.fromJson(Map<String, dynamic> json) =
       _$ActivityImpl.fromJson;
@@ -290,6 +309,8 @@ abstract class _Activity implements Activity {
   double? get Distance;
   @override
   FingerTypeModel? get FingerType;
+  @override
+  String? get location;
   @override
   @JsonKey(ignore: true)
   _$$ActivityImplCopyWith<_$ActivityImpl> get copyWith =>

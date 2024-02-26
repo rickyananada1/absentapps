@@ -20,6 +20,7 @@ _$ActivityImpl _$$ActivityImplFromJson(Map<String, dynamic> json) =>
           ? null
           : FingerTypeModel.fromJson(
               json['FingerType'] as Map<String, dynamic>),
+      location: json['location'] as String?,
     );
 
 Map<String, dynamic> _$$ActivityImplToJson(_$ActivityImpl instance) =>
@@ -31,4 +32,5 @@ Map<String, dynamic> _$$ActivityImplToJson(_$ActivityImpl instance) =>
       'Longitude': instance.Longitude,
       'Distance': instance.Distance,
       'FingerType': instance.FingerType,
+      'location': instance.location,
     };

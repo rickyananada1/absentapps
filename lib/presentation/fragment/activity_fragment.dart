@@ -22,13 +22,47 @@ class _ActivityFragmentState extends State<ActivityFragment>
   bool get wantKeepAlive => true;
   final ActivityController activityController = Get.put(ActivityController());
   final List<String> navs = ['Harian', 'Mingguan', 'Bulanan'];
+  final ScrollController _scrollController = ScrollController();
+  bool isloading = false;
+  int page = 1;
+  int top = 10;
+  int skip = 0;
+  late String C_BPartner_ID;
+
   @override
   void initState() {
     super.initState();
-    activityController.fetchActivities();
+    activityController.activities.clear();
+    activityController.groupedActivities.clear();
+    activityController.fetchActivities(
+      top: top,
+    );
+    _scrollController.addListener(_scrollListener);
+  }
+
+  void _scrollListener() async {
+    if (_scrollController.offset >=
+            _scrollController.position.maxScrollExtent &&
+        !_scrollController.position.outOfRange &&
+        activityController.hasMore.value &&
+        !activityController.isLoading.value) {
+      page++;
+      skip += top;
+      Future.delayed(const Duration(seconds: 1), () async {
+        await activityController.fetchActivities(
+            top: top, skip: skip, page: page);
+      });
+    }
+  }
+
+  void resetPage() {
+    page = 1;
+    top = 10;
+    skip = 0;
   }
 
   void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) async {
+    resetPage();
     if (args.value is PickerDateRange) {
       final startDate = args.value.startDate;
       final endDate = args.value.endDate ?? args.value.startDate;
@@ -36,12 +70,17 @@ class _ActivityFragmentState extends State<ActivityFragment>
       activityController.selectedEndDate = endDate;
       await activityController.fetchActivities(
           query:
-              'DateFinger ge ${DateFormat('yyyy-MM-dd').format(startDate)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(endDate)}');
+              'DateFinger ge ${DateFormat('yyyy-MM-dd').format(startDate)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(endDate)}',
+          top: top,
+          skip: skip,
+          page: page);
     } else if (args.value is DateTime) {
       activityController.selectedDateValue.value = args.value;
       await activityController.fetchActivities(
-          query:
-              'DateFinger eq ${DateFormat('yyyy-MM-dd').format(args.value)}');
+          query: 'DateFinger eq ${DateFormat('yyyy-MM-dd').format(args.value)}',
+          top: top,
+          skip: skip,
+          page: page);
     }
     setState(() {});
   }
@@ -60,9 +99,14 @@ class _ActivityFragmentState extends State<ActivityFragment>
         ),
         body: RefreshIndicator(
           onRefresh: () async {
-            await activityController.fetchActivities();
+            Future.delayed(const Duration(seconds: 1), () async {
+              resetPage();
+              await activityController.fetchActivities(
+                  top: top, skip: skip, page: page);
+            });
           },
           child: SingleChildScrollView(
+            controller: _scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
               children: [
@@ -75,6 +119,7 @@ class _ActivityFragmentState extends State<ActivityFragment>
                           setState(() {
                             activityController.selectedNav.value =
                                 navs.indexOf(nav);
+                            resetPage();
                             if (navs.indexOf(nav) == 0) {
                               activityController.fetchActivities(
                                   query:
@@ -234,6 +279,7 @@ class _ActivityFragmentState extends State<ActivityFragment>
                       children: [
                         IconButton(
                           onPressed: () async {
+                            resetPage();
                             if (activityController.selectedNav.value == 0) {
                               await activityController.prevDay();
                             } else if (activityController.selectedNav.value ==
@@ -275,6 +321,7 @@ class _ActivityFragmentState extends State<ActivityFragment>
                         ),
                         IconButton(
                           onPressed: () async {
+                            resetPage();
                             if (activityController.selectedNav.value == 0) {
                               await activityController.nextDay();
                             } else if (activityController.selectedNav.value ==
@@ -295,15 +342,10 @@ class _ActivityFragmentState extends State<ActivityFragment>
                   ),
                 ),
                 const SizedBox(height: 20),
-                Obx(
-                  () => activityController.isLoading.value
-                      ? Center(
-                          child: LoadingAnimationWidget.staggeredDotsWave(
-                            color: appColorPrimary,
-                            size: 30,
-                          ),
-                        )
-                      : activityController.activities.isEmpty
+                Stack(
+                  children: [
+                    Obx(
+                      () => activityController.groupedActivities.isEmpty
                           ? const Center(
                               child: Text(
                                 'Tidak ada data',
@@ -314,20 +356,48 @@ class _ActivityFragmentState extends State<ActivityFragment>
                               ),
                             )
                           : ListView.builder(
-                              physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: activityController.activities.length,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: activityController.hasMore.value
+                                  ? activityController
+                                          .groupedActivities.length +
+                                      1
+                                  : activityController.groupedActivities.length,
                               itemBuilder: (context, index) {
-                                var date = activityController
-                                    .activities[index].DateFinger!;
-                                var type = activityController
-                                    .activities[index].FingerType!.identifier!;
+                                if (index ==
+                                    activityController
+                                        .groupedActivities.length) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
                                 return ActivityComponent(
-                                  date: date,
-                                  type: type,
+                                  date: activityController
+                                      .groupedActivities[index].date,
+                                  activities: activityController
+                                      .groupedActivities[index].activities,
                                 );
                               },
                             ),
+                    ),
+                    Obx(
+                      () => Visibility(
+                        visible: activityController.isLoading.value,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                          ),
+                          height: MediaQuery.of(context).size.height,
+                          child: Center(
+                            child: LoadingAnimationWidget.staggeredDotsWave(
+                              color: appColorPrimary,
+                              size: 30,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
