@@ -23,7 +23,7 @@ class _ActivityFragmentState extends State<ActivityFragment>
   final ActivityController activityController = Get.put(ActivityController());
   final List<String> navs = ['Harian', 'Mingguan', 'Bulanan'];
   final ScrollController _scrollController = ScrollController();
-  bool isloading = false;
+  bool isLoading = false;
   int page = 1;
   int top = 10;
   int skip = 0;
@@ -34,9 +34,16 @@ class _ActivityFragmentState extends State<ActivityFragment>
     super.initState();
     activityController.activities.clear();
     activityController.groupedActivities.clear();
-    activityController.fetchActivities(
+    isLoading = true;
+    activityController
+        .fetchActivities(
       top: top,
-    );
+    )
+        .then((value) {
+      setState(() {
+        isLoading = false;
+      });
+    });
     _scrollController.addListener(_scrollListener);
   }
 
@@ -45,7 +52,7 @@ class _ActivityFragmentState extends State<ActivityFragment>
             _scrollController.position.maxScrollExtent &&
         !_scrollController.position.outOfRange &&
         activityController.hasMore.value &&
-        !activityController.isLoading.value) {
+        !isLoading) {
       page++;
       skip += top;
       Future.delayed(const Duration(seconds: 1), () async {
@@ -63,6 +70,9 @@ class _ActivityFragmentState extends State<ActivityFragment>
 
   void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) async {
     resetPage();
+    setState(() {
+      isLoading = true;
+    });
     if (args.value is PickerDateRange) {
       final startDate = args.value.startDate;
       final endDate = args.value.endDate ?? args.value.startDate;
@@ -75,14 +85,19 @@ class _ActivityFragmentState extends State<ActivityFragment>
           skip: skip,
           page: page);
     } else if (args.value is DateTime) {
+      resetPage();
+      activityController.selectedNav.value = 0;
       activityController.selectedDateValue.value = args.value;
       await activityController.fetchActivities(
-          query: 'DateFinger eq ${DateFormat('yyyy-MM-dd').format(args.value)}',
+          query:
+              'DateFinger ge ${DateFormat('yyyy-MM-dd').format(args.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(args.value.add(const Duration(days: 1)))}',
           top: top,
           skip: skip,
           page: page);
     }
-    setState(() {});
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -101,8 +116,27 @@ class _ActivityFragmentState extends State<ActivityFragment>
           onRefresh: () async {
             Future.delayed(const Duration(seconds: 1), () async {
               resetPage();
-              await activityController.fetchActivities(
-                  top: top, skip: skip, page: page);
+              setState(() {
+                activityController.activities.clear();
+                activityController.groupedActivities.clear();
+                isLoading = true;
+              });
+              if (activityController.selectedNav.value == 0) {
+                await activityController.fetchActivities(
+                    query:
+                        'DateFinger ge ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value.add(const Duration(days: 1)))}');
+              } else if (activityController.selectedNav.value == 1) {
+                await activityController.fetchActivities(
+                    query:
+                        'DateFinger ge ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value.subtract(const Duration(days: 7)))} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)}');
+              } else if (activityController.selectedNav.value == 2) {
+                await activityController.fetchActivities(
+                    query:
+                        'DateFinger ge ${DateFormat('yyyy-MM-dd').format(DateTime(activityController.selectedDateValue.value.year, activityController.selectedDateValue.value.month - 1, 1))} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)}');
+              }
+              setState(() {
+                isLoading = false;
+              });
             });
           },
           child: SingleChildScrollView(
@@ -115,27 +149,28 @@ class _ActivityFragmentState extends State<ActivityFragment>
                   children: [
                     for (var nav in navs)
                       InkWell(
-                        onTap: () {
+                        onTap: () async {
+                          activityController.selectedNav.value =
+                              navs.indexOf(nav);
+                          resetPage();
                           setState(() {
-                            activityController.selectedNav.value =
-                                navs.indexOf(nav);
-                            resetPage();
-                            if (navs.indexOf(nav) == 0) {
-                              activityController.fetchActivities(
-                                  query:
-                                      'DateFinger ge ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value.add(const Duration(days: 1)))}');
-                              // 'DateFinger eq ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)}');
-                            } else if (navs.indexOf(nav) == 1) {
-                              // get 1 week before selected date
-                              activityController.fetchActivities(
-                                  query:
-                                      'DateFinger ge ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value.subtract(const Duration(days: 7)))} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)}');
-                            } else if (navs.indexOf(nav) == 2) {
-                              // get 1 month before selected date
-                              activityController.fetchActivities(
-                                  query:
-                                      'DateFinger ge ${DateFormat('yyyy-MM-dd').format(DateTime(activityController.selectedDateValue.value.year, activityController.selectedDateValue.value.month - 1, 1))} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)}');
-                            }
+                            isLoading = true;
+                          });
+                          if (navs.indexOf(nav) == 0) {
+                            await activityController.fetchActivities(
+                                query:
+                                    'DateFinger ge ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value.add(const Duration(days: 1)))}');
+                          } else if (navs.indexOf(nav) == 1) {
+                            await activityController.fetchActivities(
+                                query:
+                                    'DateFinger ge ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value.subtract(const Duration(days: 7)))} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)}');
+                          } else if (navs.indexOf(nav) == 2) {
+                            await activityController.fetchActivities(
+                                query:
+                                    'DateFinger ge ${DateFormat('yyyy-MM-dd').format(DateTime(activityController.selectedDateValue.value.year, activityController.selectedDateValue.value.month - 1, 1))} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)}');
+                          }
+                          setState(() {
+                            isLoading = false;
                           });
                         },
                         child: Container(
@@ -199,39 +234,48 @@ class _ActivityFragmentState extends State<ActivityFragment>
                                     ),
                                   ],
                                 ),
-                                child: SfDateRangePicker(
-                                  view: DateRangePickerView.month,
-                                  initialDisplayDate: activityController
-                                      .selectedDateValue.value,
-                                  initialSelectedRange: activityController
-                                                  .selectedNav.value !=
-                                              0 &&
-                                          activityController
-                                                  .selectedStartDate !=
-                                              null &&
-                                          activityController.selectedEndDate !=
-                                              null
-                                      ? PickerDateRange(
-                                          activityController.selectedStartDate!,
-                                          activityController.selectedEndDate!)
-                                      : null,
-                                  monthViewSettings: activityController
-                                              .selectedNav.value ==
-                                          1
-                                      ? const DateRangePickerMonthViewSettings(
-                                          showWeekNumber: true,
-                                        )
-                                      : const DateRangePickerMonthViewSettings(),
-                                  selectionMode:
-                                      activityController.selectedNav.value == 0
-                                          ? DateRangePickerSelectionMode.single
-                                          : DateRangePickerSelectionMode.range,
-                                  showActionButtons: true,
-                                  onSelectionChanged: (args) {
-                                    _onSelectionChanged(args);
-                                  },
-                                  onSubmit: (_) => Navigator.pop(context),
-                                  onCancel: () => Navigator.pop(context),
+                                child: Obx(
+                                  () => SfDateRangePicker(
+                                    view: DateRangePickerView.month,
+                                    initialDisplayDate: activityController
+                                        .selectedDateValue.value,
+                                    initialSelectedDate: activityController
+                                        .selectedDateValue.value,
+                                    initialSelectedRange: activityController
+                                                    .selectedNav.value !=
+                                                0 &&
+                                            activityController
+                                                    .selectedStartDate !=
+                                                null &&
+                                            activityController
+                                                    .selectedEndDate !=
+                                                null
+                                        ? PickerDateRange(
+                                            activityController
+                                                .selectedStartDate!,
+                                            activityController.selectedEndDate!)
+                                        : null,
+                                    monthViewSettings: activityController
+                                                .selectedNav.value ==
+                                            1
+                                        ? const DateRangePickerMonthViewSettings(
+                                            showWeekNumber: true,
+                                          )
+                                        : const DateRangePickerMonthViewSettings(),
+                                    selectionMode: activityController
+                                                .selectedNav.value ==
+                                            0
+                                        ? DateRangePickerSelectionMode.single
+                                        : DateRangePickerSelectionMode.range,
+                                    showActionButtons: true,
+                                    onSelectionChanged: (args) {
+                                      setState(() {
+                                        _onSelectionChanged(args);
+                                      });
+                                    },
+                                    onSubmit: (_) => Navigator.pop(context),
+                                    onCancel: () => Navigator.pop(context),
+                                  ),
                                 ),
                               );
                             },
@@ -281,6 +325,9 @@ class _ActivityFragmentState extends State<ActivityFragment>
                         IconButton(
                           onPressed: () async {
                             resetPage();
+                            setState(() {
+                              isLoading = true;
+                            });
                             if (activityController.selectedNav.value == 0) {
                               await activityController.prevDay();
                             } else if (activityController.selectedNav.value ==
@@ -290,6 +337,9 @@ class _ActivityFragmentState extends State<ActivityFragment>
                                 2) {
                               await activityController.prevMonth();
                             }
+                            setState(() {
+                              isLoading = false;
+                            });
                           },
                           icon: const Icon(
                             Icons.arrow_back_ios,
@@ -323,6 +373,9 @@ class _ActivityFragmentState extends State<ActivityFragment>
                         IconButton(
                           onPressed: () async {
                             resetPage();
+                            setState(() {
+                              isLoading = true;
+                            });
                             if (activityController.selectedNav.value == 0) {
                               await activityController.nextDay();
                             } else if (activityController.selectedNav.value ==
@@ -332,6 +385,9 @@ class _ActivityFragmentState extends State<ActivityFragment>
                                 2) {
                               await activityController.nextMonth();
                             }
+                            setState(() {
+                              isLoading = false;
+                            });
                           },
                           icon: const Icon(
                             Icons.arrow_forward_ios,
@@ -381,19 +437,17 @@ class _ActivityFragmentState extends State<ActivityFragment>
                               },
                             ),
                     ),
-                    Obx(
-                      () => Visibility(
-                        visible: activityController.isLoading.value,
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                          ),
-                          height: MediaQuery.of(context).size.height,
-                          child: Center(
-                            child: LoadingAnimationWidget.staggeredDotsWave(
-                              color: appColorPrimary,
-                              size: 30,
-                            ),
+                    Visibility(
+                      visible: isLoading,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                        ),
+                        height: MediaQuery.of(context).size.height * 0.8,
+                        child: Center(
+                          child: LoadingAnimationWidget.staggeredDotsWave(
+                            color: appColorPrimary,
+                            size: 30,
                           ),
                         ),
                       ),

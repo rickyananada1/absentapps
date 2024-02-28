@@ -34,7 +34,6 @@ class ActivityController extends GetxController {
       C_BPartner_ID = user!.C_BPartner_ID!.toString();
     }
 
-    isLoading.value = true;
     if (selectedStartDate != null && selectedEndDate != null && query == null) {
       query =
           'C_BPartner_ID eq ${C_BPartner_ID!} and DateFinger ge ${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}';
@@ -70,7 +69,6 @@ class ActivityController extends GetxController {
         });
       },
     );
-    isLoading.value = false;
   }
 
   Future<void> nextDay() async {
