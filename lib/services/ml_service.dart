@@ -21,8 +21,6 @@ class MLService {
   img.Image? capturedImage;
   img.Image? cropedFace;
 
-  String get modelName => 'assets/mobilefacenet.tflite';
-
   MLService({int? numThreads}) {
     _interpreterOptions = InterpreterOptions();
     if (numThreads != null) {
@@ -46,8 +44,10 @@ class MLService {
         .saveUser(user!, getStringAsync('USER_ID', defaultValue: ''));
   }
 
-  Future<void> loadModel() async {
-    interpreter = await Interpreter.fromAsset(modelName);
+  Future<void> loadModel({String? modelName, int? numThreads}) async {
+    interpreter = await Interpreter.fromAsset(
+      modelName ?? 'assets/mobilefacenet.tflite',
+    );
   }
 
   Uint8List imageToByteListFloat32(
@@ -93,6 +93,7 @@ class MLService {
     List input = imageToArray(image, 112, 112);
     List output = List.filled(1 * 192, 0).reshape([1, 192]);
     interpreter.run(input, output);
+    interpreter.close();
     return List.from(output.reshape([192]));
   }
 
@@ -118,11 +119,11 @@ class MLService {
   }
 
   Future<void> doFaceDetection(File? image) async {
-    File? _image = await removeRotation(image!);
-    final Uint8List bytes = await _image.readAsBytes();
+    File? image0 = await removeRotation(image!);
+    final Uint8List bytes = await image0.readAsBytes();
     final capturedImage = img.decodeImage(bytes)!;
 
-    InputImage inputImage = InputImage.fromFile(_image);
+    InputImage inputImage = InputImage.fromFile(image0);
 
     faces = await faceDetector.processImage(inputImage);
 
@@ -151,6 +152,16 @@ class MLService {
 
       return;
     }
+  }
+
+  Future<bool> doMaskDetection() async {
+    await loadModel(modelName: 'assets/mask_detector.tflite');
+    final input = imageToArray(cropedFace!, 112, 112);
+    final output = List.filled(1 * 2, 0).reshape([1, 2]);
+    interpreter.run(input, output);
+    final result = output.reshape([2]);
+    interpreter.close();
+    return result[0] > result[1];
   }
 
   Future<File> removeRotation(File inputImage) async {

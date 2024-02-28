@@ -10,6 +10,7 @@ import '../../../core/failure.dart';
 import '../../../core/network_info.dart';
 import '../../../core/request.dart';
 import '../../../domain/entities/activity_model.dart';
+import '../../../domain/entities/ad_clientinfo.dart';
 import '../../../domain/entities/user_model.dart';
 import '../../../domain/entities/working_location_model.dart';
 import '../../../utils/strings.dart';
@@ -122,6 +123,35 @@ class ApiProvider {
       () => request.get(path, queryParameters: query),
       (data) => UserModel.fromJson(data),
     );
+  }
+
+  Future<Either<Failure, Response>> getCompanyProfile() async {
+    const path = Strings.companyProfileEndpoint;
+    Map<String, dynamic> query = {
+      '\$select': 'LogoReport_ID',
+      '\$expand': 'AD_Client(\$select=Name)',
+      '\$filter': 'AD_Client_ID eq 1000003',
+    };
+    return await handleApiResponse(
+        () => request.get(path, queryParameters: query), (data) {
+      return Response(
+        requestOptions: RequestOptions(
+          path: path,
+          method: 'GET',
+        ),
+        statusCode: 200,
+        statusMessage: 'OK',
+        data: {
+          'status': 'success',
+          'message': 'Data found',
+          'ad_client': AdClientinfo(
+              id: data['records'][0]['id'],
+              name: data['records'][0]['AD_Client'][0]['Name'],
+              uid: data['records'][0]['AD_Client'][0]['uid'],
+              image: data['records'][0]['LogoReport_ID']['data']),
+        },
+      );
+    });
   }
 
   Future<Either<Failure, Response>> postImages(

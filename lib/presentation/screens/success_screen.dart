@@ -1,7 +1,8 @@
-import 'package:absentapps/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
+
+import '../../utils/colors.dart';
 
 class SuccessScreen extends StatefulWidget {
   const SuccessScreen({super.key});

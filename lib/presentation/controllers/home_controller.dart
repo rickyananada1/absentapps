@@ -9,7 +9,7 @@ import 'auth_controller.dart';
 import '../../domain/entities/activity_model.dart';
 
 class HomeController extends GetxController {
-  final _apiProvider = serviceLocator<ActivityRepository>();
+  final _activityRepository = serviceLocator<ActivityRepository>();
   final AuthController authController = Get.find();
 
   RxBool dataFetched = false.obs;
@@ -30,6 +30,7 @@ class HomeController extends GetxController {
   Future<void> loadData() async {
     isLoading.value = true;
     await authController.getProfile();
+    await authController.getCompanyProfile();
     await getActivities();
     isLoading.value = false;
     dataFetched.value = true;
@@ -37,7 +38,7 @@ class HomeController extends GetxController {
 
   Future<void> getActivities() async {
     lastActivities.clear();
-    final result = await _apiProvider.getActivities(
+    final result = await _activityRepository.getActivities(
         'C_BPartner_ID eq ${authController.user.value!.C_BPartner_ID!.id}',
         orderBy: 'DateFinger desc',
         top: 10);
@@ -55,7 +56,6 @@ class HomeController extends GetxController {
         lastActivities.addAll(data.data['activities']);
         lastActivity = lastActivities.isNotEmpty ? lastActivities.first : null;
         updateClockTime();
-        log('lastActivity: $lastActivity');
       },
     );
   }

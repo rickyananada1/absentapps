@@ -38,8 +38,7 @@ class FaceScanController extends GetxController {
     isLoading.value = true;
 
     Future.wait([
-      mlService.doFaceDetection(image.value!),
-      LocalDb().getUser(getStringAsync('USER_ID', defaultValue: ''))
+      mlService.doFaceDetection(image.value!) // detect face
     ]).then((value) async {
       if (mlService.faces.isEmpty) {
         isLoading.value = false;
@@ -48,22 +47,17 @@ class FaceScanController extends GetxController {
         return;
       }
 
-      User? user = value[1] as User?;
-
-      if (user!.embeddings == null) {
-        showFaceRegistrationDialogue(mlService.cropedFace!);
-      } else {
-        isMatched = await mlService.compareFaces(mlService.cropedFace!);
-        if (isMatched) {
-          Get.snackbar("Face Matched", "Face Matched",
-              backgroundColor: Colors.green, colorText: Colors.white);
-          Get.offNamed('/dashboard');
-        } else {
-          Get.snackbar("Face Not Matched", "Face Not Matched",
-              backgroundColor: Colors.red, colorText: Colors.white);
-        }
+      var useMask = await mlService.doMaskDetection();
+      if (useMask) {
+        isLoading.value = false;
+        Get.snackbar('Error', 'Please remove mask',
+            backgroundColor: Colors.red, colorText: Colors.white);
+        return;
       }
 
+      await mlService.loadModel();
+
+      showFaceRegistrationDialogue(mlService.cropedFace!);
       isLoading.value = false;
     });
   }

@@ -21,7 +21,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Absent Apps',
+      title: 'Astina HR',
       debugShowCheckedModeBanner: false,
       theme: AppThemeData.lightTheme,
       // darkTheme: AppThemeData.darkTheme,

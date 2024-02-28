@@ -1,4 +1,4 @@
-name: absentapps
+name: Astina_HR
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -30,7 +30,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -64,6 +63,7 @@ dependencies:
   syncfusion_flutter_datepicker: ^24.2.6
   collection: ^1.18.0
   geocoding: ^2.2.0
+  jiffy: ^6.2.2
 
 dev_dependencies:
   flutter_test:

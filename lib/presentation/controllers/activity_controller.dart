@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 import '../../core/service_locator.dart';
@@ -42,9 +43,8 @@ class ActivityController extends GetxController {
     }
     final result = await _apiProvider.getActivities(query,
         orderBy: orderBy, top: top, skip: skip, page: page);
-    isLoading.value = false;
     result.fold(
-      (failure) async {
+      (failure) {
         Get.defaultDialog(
           title: 'Error',
           content: Text(failure.message),
@@ -53,42 +53,29 @@ class ActivityController extends GetxController {
           onConfirm: () => Get.back(),
         );
       },
-      (data) async {
+      (data) {
         final List<Activity> fetchedActivities = [];
-        for (var item in data.data['activities']) {
+        Future.wait(data.data['activities'].map<Future<void>>((item) async {
           final location = await getLocation(
               double.parse(item.Latitude!), double.parse(item.Longitude!));
           fetchedActivities.add(item.copyWith(location: location));
-        }
-
-        if (page != null && page > 1) {
-          activities.addAll(fetchedActivities);
-        } else {
-          activities.assignAll(fetchedActivities);
-        }
-        hasMore.value = data.data['page-count'] > (page ?? 1);
-        groupedActivities.assignAll(groupActivitiesByDate(activities));
+        })).then((value) {
+          if (page != null && page > 1) {
+            activities.addAll(fetchedActivities);
+          } else {
+            activities.assignAll(fetchedActivities);
+          }
+          hasMore.value = data.data['page-count'] > (page ?? 1);
+          groupedActivities.assignAll(groupActivitiesByDate(activities));
+        });
       },
     );
+    isLoading.value = false;
   }
 
   Future<void> nextDay() async {
-    if (selectedDateValue.value.day ==
-        DateTime(
-                selectedDateValue.value.year, selectedDateValue.value.month + 1)
-            .day) {
-      selectedDateValue.value = DateTime(
-        selectedDateValue.value.year,
-        selectedDateValue.value.month + 1,
-        1,
-      );
-    } else {
-      selectedDateValue.value = DateTime(
-        selectedDateValue.value.year,
-        selectedDateValue.value.month,
-        selectedDateValue.value.day + 1,
-      );
-    }
+    selectedDateValue.value =
+        selectedDateValue.value.add(const Duration(days: 1));
     // antara tanggal hari ini dan tanggal besok
     await fetchActivities(
       query:
@@ -97,43 +84,18 @@ class ActivityController extends GetxController {
   }
 
   Future<void> prevDay() async {
-    // jika hari sekarang adalah tanggal 1, maka hari sebelumnya adalah tanggal terakhir dari bulan sebelumnya
-    if (selectedDateValue.value.day == 1) {
-      selectedDateValue.value = DateTime(
-        selectedDateValue.value.year,
-        selectedDateValue.value.month - 1,
-        DateTime(
-                selectedDateValue.value.year, selectedDateValue.value.month - 1)
-            .day,
-      );
-    } else {
-      selectedDateValue.value = DateTime(
-        selectedDateValue.value.year,
-        selectedDateValue.value.month,
-        selectedDateValue.value.day - 1,
-      );
-    }
+    selectedDateValue.value =
+        selectedDateValue.value.subtract(const Duration(days: 1));
     // antara tanggal kemarin dan tanggal hari ini
     await fetchActivities(
         query:
-            'DateFinger ge ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value.subtract(const Duration(days: 1)))} and DateFinger le ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value)}');
+            'DateFinger ge ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value.add(const Duration(days: 1)))}');
   }
 
   Future<void> nextMonth() async {
-    // jika bulan sekarang adalah desember, maka bulan berikutnya adalah januari
-    if (selectedDateValue.value.month == 12) {
-      selectedDateValue.value = DateTime(
-        selectedDateValue.value.year + 1,
-        1,
-        selectedDateValue.value.day,
-      );
-    } else {
-      selectedDateValue.value = DateTime(
-        selectedDateValue.value.year,
-        selectedDateValue.value.month + 1,
-        selectedDateValue.value.day,
-      );
-    }
+    selectedDateValue.value = Jiffy.parseFromDateTime(selectedDateValue.value)
+        .add(months: 1)
+        .dateTime;
 
     await fetchActivities(
         query:
@@ -141,20 +103,9 @@ class ActivityController extends GetxController {
   }
 
   Future<void> prevMonth() async {
-    // jika bulan sekarang adalah januari, maka bulan sebelumnya adalah desember
-    if (selectedDateValue.value.month == 1) {
-      selectedDateValue.value = DateTime(
-        selectedDateValue.value.year - 1,
-        12,
-        selectedDateValue.value.day,
-      );
-    } else {
-      selectedDateValue.value = DateTime(
-        selectedDateValue.value.year,
-        selectedDateValue.value.month - 1,
-        selectedDateValue.value.day,
-      );
-    }
+    selectedDateValue.value = Jiffy.parseFromDateTime(selectedDateValue.value)
+        .subtract(months: 1)
+        .dateTime;
 
     await fetchActivities(
         query:
@@ -162,23 +113,8 @@ class ActivityController extends GetxController {
   }
 
   Future<void> nextWeek() async {
-    // jika hari sekarang ditambah 7 adalah lebih dari jumlah hari dalam bulan tersebut, maka hari berikutnya adalah tanggal 1 dari bulan berikutnya
-    if (selectedDateValue.value.day + 7 >
-        DateTime(
-                selectedDateValue.value.year, selectedDateValue.value.month + 1)
-            .day) {
-      selectedDateValue.value = DateTime(
-        selectedDateValue.value.year,
-        selectedDateValue.value.month + 1,
-        1,
-      );
-    } else {
-      selectedDateValue.value = DateTime(
-        selectedDateValue.value.year,
-        selectedDateValue.value.month,
-        selectedDateValue.value.day + 7,
-      );
-    }
+    selectedDateValue.value =
+        selectedDateValue.value.add(const Duration(days: 7));
 
     await fetchActivities(
         query:
@@ -186,22 +122,8 @@ class ActivityController extends GetxController {
   }
 
   Future<void> prevWeek() async {
-    // jika hari sekarang dikurangi 7 adalah kurang dari 1, maka hari sebelumnya adalah tanggal terakhir dari bulan sebelumnya
-    if (selectedDateValue.value.day - 7 < 1) {
-      selectedDateValue.value = DateTime(
-        selectedDateValue.value.year,
-        selectedDateValue.value.month - 1,
-        DateTime(
-                selectedDateValue.value.year, selectedDateValue.value.month - 1)
-            .day,
-      );
-    } else {
-      selectedDateValue.value = DateTime(
-        selectedDateValue.value.year,
-        selectedDateValue.value.month,
-        selectedDateValue.value.day - 7,
-      );
-    }
+    selectedDateValue.value =
+        selectedDateValue.value.subtract(const Duration(days: 7));
 
     await fetchActivities(
         query:

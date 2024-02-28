@@ -5,16 +5,18 @@ import 'package:nb_utils/nb_utils.dart';
 import '../../core/request.dart';
 import '../../core/service_locator.dart';
 import '../../data/repository/auth_repository.dart';
+import '../../domain/entities/ad_clientinfo.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/entities/user_model.dart';
 import '../../utils/local_db.dart';
 
 class AuthController extends GetxController {
-  final _apiProvider = serviceLocator<AuthRepository>();
+  final _authrepository = serviceLocator<AuthRepository>();
 
   final RxBool isLoading = false.obs;
   final RxBool rememberMe = false.obs;
-  final Rx<UserModel?> user = Rx<UserModel?>(null);
+  final Rxn<UserModel?> user = Rxn<UserModel>();
+  final Rxn<AdClientinfo?> client = Rxn<AdClientinfo>();
 
   @override
   void onInit() {
@@ -25,7 +27,7 @@ class AuthController extends GetxController {
 
   Future<void> login(String username, String password) async {
     isLoading.value = true;
-    final response = await _apiProvider.login(username, password);
+    final response = await _authrepository.login(username, password);
     response.fold(
       (failure) async {
         Get.defaultDialog(
@@ -53,9 +55,7 @@ class AuthController extends GetxController {
         await getProfile();
         var userExists = await LocalDb()
             .getUser(getStringAsync('USER_ID', defaultValue: ''));
-        if (userExists != null) {
-          Get.offNamed('/face_scan');
-        } else {
+        if (userExists == null) {
           await LocalDb().saveUser(
             User(
               NIP: user.value!.NIP,
@@ -66,6 +66,8 @@ class AuthController extends GetxController {
             getStringAsync('USER_ID', defaultValue: ''),
           );
           Get.offNamed('/face_register');
+        } else {
+          Get.offNamed('/dashboard');
         }
       },
     );
@@ -74,7 +76,7 @@ class AuthController extends GetxController {
 
   Future<void> getProfile() async {
     String userId = getStringAsync('USER_ID', defaultValue: '');
-    final response = await _apiProvider.getProfile(userId);
+    final response = await _authrepository.getProfile(userId);
     response.fold(
       (failure) async {
         if (failure.code == 401) {
@@ -83,6 +85,24 @@ class AuthController extends GetxController {
       },
       (data) async {
         user.value = data;
+      },
+    );
+  }
+
+  Future<void> getCompanyProfile() async {
+    final response = await _authrepository.getCompanyProfile();
+    response.fold(
+      (failure) {
+        Get.defaultDialog(
+          title: 'Error',
+          content: Text(failure.message),
+          textConfirm: 'OK',
+          confirmTextColor: Colors.white,
+          onConfirm: () => Get.back(),
+        );
+      },
+      (data) {
+        client.value = data.data['ad_client'];
       },
     );
   }
@@ -97,7 +117,7 @@ class AuthController extends GetxController {
     isLoading.value = true;
     var name = '${user.NIP}.jpg';
     var description = 'Face Image of ${user.NIP}';
-    final response = await _apiProvider.postImages(name, description, image);
+    final response = await _authrepository.postImages(name, description, image);
     isLoading.value = false;
     response.fold(
       (failure) async {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -67,11 +68,23 @@ class _ProfileFragmentState extends State<ProfileFragment>
                     children: [
                       Column(
                         children: [
-                          CommonCachedNetworkImage(ic_profile,
-                              width: 130,
-                              height: 130,
-                              fit: BoxFit.cover,
-                              radius: 75),
+                          Container(
+                            decoration: boxDecorationWithRoundedCorners(
+                              backgroundColor: Colors.white,
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(75),
+                              ),
+                              border: Border.all(
+                                color: Colors.grey,
+                                width: 0.5,
+                              ),
+                            ),
+                            child: CommonCachedNetworkImage(ic_profile,
+                                width: 130,
+                                height: 130,
+                                fit: BoxFit.cover,
+                                radius: 75),
+                          ),
                           16.height,
                           Text(authController.user.value!.EmployeeName!,
                               style: boldTextStyle()),

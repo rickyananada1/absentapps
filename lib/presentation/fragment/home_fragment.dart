@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
@@ -131,11 +133,21 @@ class _HomeFragmentState extends State<HomeFragment>
                                   children: [
                                     Row(
                                       children: [
-                                        Image.asset(
-                                          'assets/images/logo.png',
-                                          width: 50,
-                                          height: 50,
-                                        ),
+                                        controller.authController.client.value!
+                                                .image.isNotEmpty
+                                            ? Image.memory(
+                                                base64Decode(controller
+                                                    .authController
+                                                    .client
+                                                    .value!
+                                                    .image),
+                                                width: 50,
+                                                height: 50,
+                                              )
+                                            : const Icon(
+                                                Icons.business,
+                                                size: 50,
+                                              ),
                                         10.width,
                                         Expanded(
                                           child: Column(
@@ -144,9 +156,10 @@ class _HomeFragmentState extends State<HomeFragment>
                                             children: [
                                               Row(
                                                 children: [
-                                                  const Text(
-                                                    'PT. Abadi Ogan Cemerlang',
-                                                    style: TextStyle(
+                                                  Text(
+                                                    controller.authController
+                                                        .client.value!.name,
+                                                    style: const TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       fontSize: 20,

@@ -19,12 +19,12 @@ class AuthRepository {
     return await _apiProvider.getProfile(userId);
   }
 
+  Future<Either<Failure, Response>> getCompanyProfile() async {
+    return await _apiProvider.getCompanyProfile();
+  }
+
   Future<Either<Failure, Response>> postImages(
       String name, String description, String image) async {
     return await _apiProvider.postImages(name, description, image);
   }
-
-  // Future<Either<Failure, Response>> logout() async {
-  //   return await _apiProvider.logout();
-  // }
 }

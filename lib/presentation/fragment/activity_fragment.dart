@@ -123,7 +123,8 @@ class _ActivityFragmentState extends State<ActivityFragment>
                             if (navs.indexOf(nav) == 0) {
                               activityController.fetchActivities(
                                   query:
-                                      'DateFinger eq ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)}');
+                                      'DateFinger ge ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value.add(const Duration(days: 1)))}');
+                              // 'DateFinger eq ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)}');
                             } else if (navs.indexOf(nav) == 1) {
                               // get 1 week before selected date
                               activityController.fetchActivities(
