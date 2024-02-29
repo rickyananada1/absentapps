@@ -20,7 +20,8 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       Office: json['Office'] as String?,
       Department: json['Department'] as String?,
       Position: json['Position'] as String?,
-      IsAllowFingerfromAnywhere: json['IsAllowFingerfromAnywhere'] as bool?,
+      IsAllowFingerfromAnywhere:
+          json['IsAllowFingerfromAnywhere'] as bool? ?? false,
       model_name: json['model_name'] as String?,
       embeddings: (json['embeddings'] as List<dynamic>?)
           ?.map((e) => (e as num).toDouble())

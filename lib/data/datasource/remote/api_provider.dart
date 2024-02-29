@@ -183,14 +183,17 @@ class ApiProvider {
     );
   }
 
-  Future<Either<Failure, Response>> getActivities(String? query,
+  Future<Either<Failure, Response>> getActivities(
+      String? query, String cBpartnerId,
       {String? orderBy, int? top, int? skip, int? page}) async {
     const path = Strings.activitiesEndpoint;
 
     Map<String, dynamic> buildQuery = {
       '\$select':
           'DateFinger,HR_Location_ID,Latitude,Longitude,Distance,FingerType',
-      '\$filter': query,
+      '\$filter': query != null
+          ? 'C_BPartner_ID eq $cBpartnerId and $query'
+          : 'C_BPartner_ID eq $cBpartnerId',
       '\$orderby': orderBy ?? 'DateFinger asc',
       '\$top': top,
       '\$skip': skip,

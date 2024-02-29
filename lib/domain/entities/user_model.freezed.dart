@@ -29,7 +29,7 @@ mixin _$UserModel {
   String? get Office => throw _privateConstructorUsedError;
   String? get Department => throw _privateConstructorUsedError;
   String? get Position => throw _privateConstructorUsedError;
-  bool? get IsAllowFingerfromAnywhere => throw _privateConstructorUsedError;
+  bool get IsAllowFingerfromAnywhere => throw _privateConstructorUsedError;
   String? get model_name => throw _privateConstructorUsedError;
   List<double>? get embeddings => throw _privateConstructorUsedError;
   double? get distance => throw _privateConstructorUsedError;
@@ -55,7 +55,7 @@ abstract class $UserModelCopyWith<$Res> {
       String? Office,
       String? Department,
       String? Position,
-      bool? IsAllowFingerfromAnywhere,
+      bool IsAllowFingerfromAnywhere,
       String? model_name,
       List<double>? embeddings,
       double? distance});
@@ -85,7 +85,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? Office = freezed,
     Object? Department = freezed,
     Object? Position = freezed,
-    Object? IsAllowFingerfromAnywhere = freezed,
+    Object? IsAllowFingerfromAnywhere = null,
     Object? model_name = freezed,
     Object? embeddings = freezed,
     Object? distance = freezed,
@@ -127,10 +127,10 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.Position
           : Position // ignore: cast_nullable_to_non_nullable
               as String?,
-      IsAllowFingerfromAnywhere: freezed == IsAllowFingerfromAnywhere
+      IsAllowFingerfromAnywhere: null == IsAllowFingerfromAnywhere
           ? _value.IsAllowFingerfromAnywhere
           : IsAllowFingerfromAnywhere // ignore: cast_nullable_to_non_nullable
-              as bool?,
+              as bool,
       model_name: freezed == model_name
           ? _value.model_name
           : model_name // ignore: cast_nullable_to_non_nullable
@@ -177,7 +177,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
       String? Office,
       String? Department,
       String? Position,
-      bool? IsAllowFingerfromAnywhere,
+      bool IsAllowFingerfromAnywhere,
       String? model_name,
       List<double>? embeddings,
       double? distance});
@@ -206,7 +206,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? Office = freezed,
     Object? Department = freezed,
     Object? Position = freezed,
-    Object? IsAllowFingerfromAnywhere = freezed,
+    Object? IsAllowFingerfromAnywhere = null,
     Object? model_name = freezed,
     Object? embeddings = freezed,
     Object? distance = freezed,
@@ -248,10 +248,10 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.Position
           : Position // ignore: cast_nullable_to_non_nullable
               as String?,
-      IsAllowFingerfromAnywhere: freezed == IsAllowFingerfromAnywhere
+      IsAllowFingerfromAnywhere: null == IsAllowFingerfromAnywhere
           ? _value.IsAllowFingerfromAnywhere
           : IsAllowFingerfromAnywhere // ignore: cast_nullable_to_non_nullable
-              as bool?,
+              as bool,
       model_name: freezed == model_name
           ? _value.model_name
           : model_name // ignore: cast_nullable_to_non_nullable
@@ -281,7 +281,7 @@ class _$UserModelImpl implements _UserModel {
       required this.Office,
       required this.Department,
       required this.Position,
-      required this.IsAllowFingerfromAnywhere,
+      this.IsAllowFingerfromAnywhere = false,
       required this.model_name,
       required final List<double>? embeddings,
       required this.distance})
@@ -309,7 +309,8 @@ class _$UserModelImpl implements _UserModel {
   @override
   final String? Position;
   @override
-  final bool? IsAllowFingerfromAnywhere;
+  @JsonKey()
+  final bool IsAllowFingerfromAnywhere;
   @override
   final String? model_name;
   final List<double>? _embeddings;
@@ -402,7 +403,7 @@ abstract class _UserModel implements UserModel {
       required final String? Office,
       required final String? Department,
       required final String? Position,
-      required final bool? IsAllowFingerfromAnywhere,
+      final bool IsAllowFingerfromAnywhere,
       required final String? model_name,
       required final List<double>? embeddings,
       required final double? distance}) = _$UserModelImpl;
@@ -429,7 +430,7 @@ abstract class _UserModel implements UserModel {
   @override
   String? get Position;
   @override
-  bool? get IsAllowFingerfromAnywhere;
+  bool get IsAllowFingerfromAnywhere;
   @override
   String? get model_name;
   @override

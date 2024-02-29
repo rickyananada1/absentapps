@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
-import 'dart:ui';
 
+import 'package:flutter/services.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
@@ -20,6 +20,7 @@ class MLService {
   User? user;
   img.Image? capturedImage;
   img.Image? cropedFace;
+  late List<String> labels;
 
   MLService({int? numThreads}) {
     _interpreterOptions = InterpreterOptions();
@@ -30,7 +31,6 @@ class MLService {
       performanceMode: FaceDetectorMode.accurate,
     );
     faceDetector = FaceDetector(options: options);
-    loadModel();
     initialize();
   }
 
@@ -48,6 +48,12 @@ class MLService {
     interpreter = await Interpreter.fromAsset(
       modelName ?? 'assets/mobilefacenet.tflite',
     );
+  }
+
+  // load labels
+  Future<void> loadLabels() async {
+    final labelTxt = await rootBundle.loadString('assets/labels.txt');
+    labels = labelTxt.split('\n');
   }
 
   Uint8List imageToByteListFloat32(
@@ -156,12 +162,12 @@ class MLService {
 
   Future<bool> doMaskDetection() async {
     await loadModel(modelName: 'assets/mask_detector.tflite');
-    final input = imageToArray(cropedFace!, 112, 112);
-    final output = List.filled(1 * 2, 0).reshape([1, 2]);
+    await loadLabels();
+    List input = imageToArray(cropedFace!, 112, 112);
+    List output = List.filled(1 * 2, 0).reshape([1, 2]);
     interpreter.run(input, output);
-    final result = output.reshape([2]);
     interpreter.close();
-    return result[0] > result[1];
+    return output[0][0] > output[0][1];
   }
 
   Future<File> removeRotation(File inputImage) async {

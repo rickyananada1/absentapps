@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -92,9 +91,7 @@ class _ProfileFragmentState extends State<ProfileFragment>
                           Text(authController.user.value!.Position!,
                               style: secondaryTextStyle()),
                           8.height,
-                          authController
-                                      .user.value!.IsAllowFingerfromAnywhere ??
-                                  false
+                          authController.user.value!.IsAllowFingerfromAnywhere
                               ? const Text('Finger from Anywhere',
                                   style: TextStyle(
                                       color: Colors.green,

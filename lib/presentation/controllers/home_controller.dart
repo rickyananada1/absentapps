@@ -39,7 +39,7 @@ class HomeController extends GetxController {
   Future<void> getActivities() async {
     lastActivities.clear();
     final result = await _activityRepository.getActivities(
-        'C_BPartner_ID eq ${authController.user.value!.C_BPartner_ID!.id}',
+        C_BPartner_ID: authController.user.value!.C_BPartner_ID!.id.toString(),
         orderBy: 'DateFinger desc',
         top: 10);
     result.fold(

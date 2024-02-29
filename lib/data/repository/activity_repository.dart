@@ -12,9 +12,14 @@ class ActivityRepository {
   ActivityRepository({required ApiProvider apiProvider})
       : _apiProvider = apiProvider;
 
-  Future<Either<Failure, Response>> getActivities(String? query,
-      {String? orderBy, int? top, int? skip, int? page}) async {
-    return await _apiProvider.getActivities(query,
+  Future<Either<Failure, Response>> getActivities(
+      {String? query,
+      required String C_BPartner_ID,
+      String? orderBy,
+      int? top,
+      int? skip,
+      int? page}) async {
+    return await _apiProvider.getActivities(query, C_BPartner_ID,
         orderBy: orderBy, top: top, skip: skip, page: page);
   }
 

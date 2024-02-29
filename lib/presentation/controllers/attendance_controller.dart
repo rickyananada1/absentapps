@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
-
 import 'package:nb_utils/nb_utils.dart';
 
 import '../../core/service_locator.dart';
@@ -23,15 +22,14 @@ class AttendanceController extends GetxController {
   final AuthController authController = Get.put(AuthController());
   final HomeController homeController = Get.find();
   final ActivityController activityController = Get.put(ActivityController());
-  Rxn<File> image = Rxn<File>();
+
   late FaceDetector faceDetector;
   late MLService mlService;
+  late Rxn<File> image;
   RxList<WorkingLocation> workingLocations = <WorkingLocation>[].obs;
-  RxBool inLocation = false.obs;
+  late RxBool inLocation;
   late Position currentLocation;
-  bool isMatched = false;
-  double distanceInMeters = 0;
-  RxBool isLoading = false.obs;
+  late RxBool isLoading;
 
   @override
   void onInit() {
@@ -40,14 +38,14 @@ class AttendanceController extends GetxController {
     );
     faceDetector = FaceDetector(options: options);
     mlService = MLService();
-    init();
+    image = Rxn<File>();
+    isLoading = false.obs;
+    inLocation = false.obs;
     super.onInit();
   }
 
   Future<void> init() async {
     await authController.getProfile();
-    currentLocation = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
     await getWorkingLocation();
   }
 
@@ -71,95 +69,108 @@ class AttendanceController extends GetxController {
       return;
     }
 
-    Future.wait([
-      mlService.doFaceDetection(image.value!),
-      checkLocation(),
-    ]).then((value) async {
-      if (mlService.faces.isEmpty) {
-        isLoading.value = false;
-        Get.snackbar('Error', 'No face detected',
-            backgroundColor: Colors.red, colorText: Colors.white);
-        return;
-      }
+    await mlService.doFaceDetection(image.value!);
+    if (!homeController.authController.user.value!.IsAllowFingerfromAnywhere) {
+      inLocation.value = true;
+    } else {
+      await checkLocation();
+    }
 
-      isMatched = await mlService.compareFaces(mlService.cropedFace!);
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    LocationPermission permission = await Geolocator.checkPermission();
 
-      if (!isMatched) {
-        isLoading.value = false;
-        Get.snackbar('Error', 'Face not matched',
-            backgroundColor: Colors.red, colorText: Colors.white);
-        return;
-      }
-
-      if (!inLocation.value) {
-        isLoading.value = false;
-        return;
-      }
-
-      var now = DateTime.now();
-      var user =
-          await LocalDb().getUser(getStringAsync('USER_ID', defaultValue: ''));
-      final response = await _apiProvider.postAttendance(
-        user!.C_BPartner_ID!,
-        now,
-        currentLocation.latitude,
-        currentLocation.longitude,
-        5,
-        homeController.fingerType.value,
-      );
-
-      response.fold(
-        (failure) {
-          Get.snackbar('Error', failure.message);
-        },
-        (data) async {
-          var message = await setMessage(now, homeController.fingerType.value);
-          await LocalDb().saveUser(
-            User(
-              NIP: user.NIP,
-              EmployeeName: user.EmployeeName,
-              C_BPartner_ID: user.C_BPartner_ID,
-              embeddings: user.embeddings,
-            ),
-            getStringAsync('USER_ID', defaultValue: ''),
-          );
-          await homeController.loadData();
-          await activityController.fetchActivities();
-          Get.offAndToNamed('/success', arguments: {
-            'title': 'PRESENSI BERHASIL!',
-            'message': message,
-          });
-        },
-      );
+    if (!serviceEnabled || permission == LocationPermission.deniedForever) {
+      Get.snackbar('Error',
+          'Location services/permissions are disabled/permanently denied',
+          backgroundColor: Colors.red, colorText: Colors.white);
       isLoading.value = false;
-    });
+      return;
+    }
+
+    if (mlService.faces.isEmpty) {
+      Get.snackbar('Error', 'No face detected',
+          backgroundColor: Colors.red, colorText: Colors.white);
+      isLoading.value = false;
+      return;
+    }
+
+    var useMask = await mlService.doMaskDetection();
+    if (useMask) {
+      Get.snackbar('Error', 'Please remove mask',
+          backgroundColor: Colors.red, colorText: Colors.white);
+      isLoading.value = false;
+      return;
+    }
+
+    currentLocation = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    // if (currentLocation.isMocked) {
+    //   Get.snackbar('Error', 'Fake location detected',
+    //       backgroundColor: Colors.red, colorText: Colors.white);
+    //   isLoading.value = false;
+    //   return;
+    // }
+
+    if (!inLocation.value) {
+      Get.snackbar('Error', 'You are not in the working location',
+          backgroundColor: Colors.red, colorText: Colors.white);
+      isLoading.value = false;
+      return;
+    }
+
+    await mlService.loadModel();
+    bool isMatched = await mlService.compareFaces(mlService.cropedFace!);
+
+    if (!isMatched) {
+      Get.snackbar('Error', 'Face not matched',
+          backgroundColor: Colors.red, colorText: Colors.white);
+      isLoading.value = false;
+      return;
+    }
+
+    var now = DateTime.now();
+    var user =
+        await LocalDb().getUser(getStringAsync('USER_ID', defaultValue: ''));
+    final response = await _apiProvider.postAttendance(
+      user!.C_BPartner_ID!,
+      now,
+      currentLocation.latitude,
+      currentLocation.longitude,
+      5,
+      homeController.fingerType.value,
+    );
+
+    response.fold(
+      (failure) {
+        Get.snackbar('Error', failure.message);
+      },
+      (data) async {
+        var message = await setMessage(now, homeController.fingerType.value);
+        await LocalDb().saveUser(
+          User(
+            NIP: user.NIP,
+            EmployeeName: user.EmployeeName,
+            C_BPartner_ID: user.C_BPartner_ID,
+            embeddings: user.embeddings,
+          ),
+          getStringAsync('USER_ID', defaultValue: ''),
+        );
+        await homeController.loadData();
+        await activityController.fetchActivities();
+        Get.offAndToNamed('/success', arguments: {
+          'title': 'PRESENSI BERHASIL!',
+          'message': message,
+        });
+      },
+    );
+    isLoading.value = false;
   }
 
   Future<void> checkLocation() async {
-    if (authController.user.value!.IsAllowFingerfromAnywhere!) {
-      inLocation.value = true;
-      return;
-    }
-
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      Get.snackbar('Error', 'Location services are disabled',
-          backgroundColor: Colors.red, colorText: Colors.white);
-      return;
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.deniedForever) {
-      Get.snackbar('Error', 'Location permissions are permanently denied',
-          backgroundColor: Colors.red, colorText: Colors.white);
-      return;
-    }
-
+    inLocation.value = false;
     for (WorkingLocation location in workingLocations) {
-      distanceInMeters = Geolocator.distanceBetween(
+      double distanceInMeters = Geolocator.distanceBetween(
         currentLocation.latitude,
         currentLocation.longitude,
         location.Latitude!.toDouble(),
@@ -171,15 +182,9 @@ class AttendanceController extends GetxController {
         break;
       }
     }
-    if (!inLocation.value) {
-      Get.snackbar('Error', 'You are not in the working location',
-          backgroundColor: Colors.red, colorText: Colors.white);
-      return;
-    }
   }
 
   Future<String> setMessage(var now, var fingerType) async {
-    // ambil waktu terlambat
     var late = DateTime(now.year, now.month, now.day, 19, 0, 0);
     var lateDuration = now.difference(late).inMinutes;
     var message = '';

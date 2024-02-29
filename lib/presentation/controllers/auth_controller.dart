@@ -66,6 +66,8 @@ class AuthController extends GetxController {
             getStringAsync('USER_ID', defaultValue: ''),
           );
           Get.offNamed('/face_register');
+        } else if (userExists.embeddings == null) {
+          Get.offNamed('/face_register');
         } else {
           Get.offNamed('/dashboard');
         }

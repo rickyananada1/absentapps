@@ -45,6 +45,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   @override
   void initState() {
     super.initState();
+    attendanceController.init();
     initializeCamera();
   }
 

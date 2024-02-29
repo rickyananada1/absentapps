@@ -24,24 +24,32 @@ class ActivityController extends GetxController {
   Rx<DateTime> selectedDateValue = DateTime.now().obs;
   RxInt selectedNav = 2.obs;
   RxBool hasMore = true.obs;
+  String? query;
   String? C_BPartner_ID;
+  RxStatus status = RxStatus.loading();
+
+  @override
+  void onInit() {
+    super.onInit();
+    init();
+  }
+
+  Future<void> init() async {
+    var user =
+        await LocalDb().getUser(getStringAsync('USER_ID', defaultValue: ''));
+    C_BPartner_ID = user!.C_BPartner_ID!.toString();
+  }
 
   Future<void> fetchActivities(
-      {String? query, String? orderBy, int? top, int? skip, int? page}) async {
-    if (C_BPartner_ID == null) {
-      var user =
-          await LocalDb().getUser(getStringAsync('USER_ID', defaultValue: ''));
-      C_BPartner_ID = user!.C_BPartner_ID!.toString();
-    }
+      {String? orderBy, int? top, int? skip, int? page}) async {
+    final result = await _apiProvider.getActivities(
+        query: query,
+        C_BPartner_ID: C_BPartner_ID!,
+        orderBy: orderBy,
+        top: top,
+        skip: skip,
+        page: page);
 
-    if (selectedStartDate != null && selectedEndDate != null && query == null) {
-      query =
-          'C_BPartner_ID eq ${C_BPartner_ID!} and DateFinger ge ${DateFormat('yyyy-MM-dd').format(selectedStartDate!)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(selectedEndDate!)}';
-    } else {
-      query ??= 'C_BPartner_ID eq ${C_BPartner_ID!}';
-    }
-    final result = await _apiProvider.getActivities(query,
-        orderBy: orderBy, top: top, skip: skip, page: page);
     result.fold(
       (failure) {
         Get.defaultDialog(
@@ -75,19 +83,28 @@ class ActivityController extends GetxController {
     selectedDateValue.value =
         selectedDateValue.value.add(const Duration(days: 1));
     // antara tanggal hari ini dan tanggal besok
+    activities.clear();
+    groupedActivities.clear();
+    query =
+        'DateFinger ge ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value.add(const Duration(days: 1)))}';
     await fetchActivities(
-      query:
-          'DateFinger ge ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value.add(const Duration(days: 1)))}',
+      top: 10,
+      skip: 0,
     );
   }
 
   Future<void> prevDay() async {
     selectedDateValue.value =
         selectedDateValue.value.subtract(const Duration(days: 1));
+    activities.clear();
+    groupedActivities.clear();
+    query =
+        'DateFinger ge ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value.add(const Duration(days: 1)))}';
     // antara tanggal kemarin dan tanggal hari ini
     await fetchActivities(
-        query:
-            'DateFinger ge ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value.add(const Duration(days: 1)))}');
+      top: 10,
+      skip: 0,
+    );
   }
 
   Future<void> nextMonth() async {
@@ -95,9 +112,14 @@ class ActivityController extends GetxController {
         .add(months: 1)
         .dateTime;
 
+    activities.clear();
+    groupedActivities.clear();
+    query =
+        'DateFinger ge ${DateFormat('yyyy-MM-01').format(selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-01').format(Jiffy.parseFromDateTime(selectedDateValue.value).add(months: 1).dateTime)}';
     await fetchActivities(
-        query:
-            'DateFinger ge ${DateFormat('yyyy-MM-01').format(selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-31').format(selectedDateValue.value)}');
+      top: 10,
+      skip: 0,
+    );
   }
 
   Future<void> prevMonth() async {
@@ -105,27 +127,36 @@ class ActivityController extends GetxController {
         .subtract(months: 1)
         .dateTime;
 
+    activities.clear();
+    groupedActivities.clear();
+    query =
+        'DateFinger ge ${DateFormat('yyyy-MM-01').format(selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-01').format(Jiffy.parseFromDateTime(selectedDateValue.value).add(months: 1).dateTime)}';
     await fetchActivities(
-        query:
-            'DateFinger ge ${DateFormat('yyyy-MM-01').format(selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-31').format(selectedDateValue.value)}');
+      top: 10,
+      skip: 0,
+    );
   }
 
   Future<void> nextWeek() async {
     selectedDateValue.value =
-        selectedDateValue.value.add(const Duration(days: 7));
+        selectedDateValue.value.add(const Duration(days: 6));
 
-    await fetchActivities(
-        query:
-            'DateFinger ge ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value.add(const Duration(days: 6)))}');
+    activities.clear();
+    groupedActivities.clear();
+    query =
+        'DateFinger ge ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value.add(const Duration(days: 8)))}';
+    await fetchActivities(top: 10, skip: 0);
   }
 
   Future<void> prevWeek() async {
     selectedDateValue.value =
-        selectedDateValue.value.subtract(const Duration(days: 7));
+        selectedDateValue.value.subtract(const Duration(days: 6));
 
-    await fetchActivities(
-        query:
-            'DateFinger ge ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value.add(const Duration(days: 6)))}');
+    activities.clear();
+    groupedActivities.clear();
+    query =
+        'DateFinger ge ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(selectedDateValue.value.add(const Duration(days: 8)))}';
+    await fetchActivities(top: 10, skip: 0);
   }
 
   List<GroupedActivity> groupActivitiesByDate(List<Activity> activities) {

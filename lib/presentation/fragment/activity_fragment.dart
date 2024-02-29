@@ -23,7 +23,6 @@ class _ActivityFragmentState extends State<ActivityFragment>
   final ActivityController activityController = Get.put(ActivityController());
   final List<String> navs = ['Harian', 'Mingguan', 'Bulanan'];
   final ScrollController _scrollController = ScrollController();
-  bool isLoading = false;
   int page = 1;
   int top = 10;
   int skip = 0;
@@ -32,19 +31,19 @@ class _ActivityFragmentState extends State<ActivityFragment>
   @override
   void initState() {
     super.initState();
+    init();
+    _scrollController.addListener(_scrollListener);
+  }
+
+  void init() async {
+    await activityController.init();
     activityController.activities.clear();
     activityController.groupedActivities.clear();
-    isLoading = true;
-    activityController
-        .fetchActivities(
+
+    await activityController.fetchActivities(
       top: top,
-    )
-        .then((value) {
-      setState(() {
-        isLoading = false;
-      });
-    });
-    _scrollController.addListener(_scrollListener);
+    );
+    activityController.isLoading.value = false;
   }
 
   void _scrollListener() async {
@@ -52,7 +51,7 @@ class _ActivityFragmentState extends State<ActivityFragment>
             _scrollController.position.maxScrollExtent &&
         !_scrollController.position.outOfRange &&
         activityController.hasMore.value &&
-        !isLoading) {
+        !activityController.isLoading.value) {
       page++;
       skip += top;
       Future.delayed(const Duration(seconds: 1), () async {
@@ -71,32 +70,30 @@ class _ActivityFragmentState extends State<ActivityFragment>
   void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) async {
     resetPage();
     setState(() {
-      isLoading = true;
+      activityController.activities.clear();
+      activityController.groupedActivities.clear();
+      activityController.isLoading.value = true;
     });
     if (args.value is PickerDateRange) {
       final startDate = args.value.startDate;
       final endDate = args.value.endDate ?? args.value.startDate;
       activityController.selectedStartDate = startDate;
       activityController.selectedEndDate = endDate;
+      activityController.query =
+          'DateFinger ge ${DateFormat('yyyy-MM-dd').format(startDate)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(endDate.add(const Duration(days: 1)))}';
       await activityController.fetchActivities(
-          query:
-              'DateFinger ge ${DateFormat('yyyy-MM-dd').format(startDate)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(endDate)}',
-          top: top,
-          skip: skip,
-          page: page);
+          top: top, skip: skip, page: page);
     } else if (args.value is DateTime) {
       resetPage();
       activityController.selectedNav.value = 0;
       activityController.selectedDateValue.value = args.value;
+      activityController.query =
+          'DateFinger ge ${DateFormat('yyyy-MM-dd').format(args.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(args.value.add(const Duration(days: 1)))}';
       await activityController.fetchActivities(
-          query:
-              'DateFinger ge ${DateFormat('yyyy-MM-dd').format(args.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(args.value.add(const Duration(days: 1)))}',
-          top: top,
-          skip: skip,
-          page: page);
+          top: top, skip: skip, page: page);
     }
     setState(() {
-      isLoading = false;
+      activityController.isLoading.value = false;
     });
   }
 
@@ -119,23 +116,12 @@ class _ActivityFragmentState extends State<ActivityFragment>
               setState(() {
                 activityController.activities.clear();
                 activityController.groupedActivities.clear();
-                isLoading = true;
+                activityController.isLoading.value = true;
               });
-              if (activityController.selectedNav.value == 0) {
-                await activityController.fetchActivities(
-                    query:
-                        'DateFinger ge ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value.add(const Duration(days: 1)))}');
-              } else if (activityController.selectedNav.value == 1) {
-                await activityController.fetchActivities(
-                    query:
-                        'DateFinger ge ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value.subtract(const Duration(days: 7)))} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)}');
-              } else if (activityController.selectedNav.value == 2) {
-                await activityController.fetchActivities(
-                    query:
-                        'DateFinger ge ${DateFormat('yyyy-MM-dd').format(DateTime(activityController.selectedDateValue.value.year, activityController.selectedDateValue.value.month - 1, 1))} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)}');
-              }
+              await activityController.fetchActivities(
+                  top: top, skip: skip, page: page);
               setState(() {
-                isLoading = false;
+                activityController.isLoading.value = false;
               });
             });
           },
@@ -154,23 +140,24 @@ class _ActivityFragmentState extends State<ActivityFragment>
                               navs.indexOf(nav);
                           resetPage();
                           setState(() {
-                            isLoading = true;
+                            activityController.activities.clear();
+                            activityController.groupedActivities.clear();
+                            activityController.isLoading.value = true;
                           });
                           if (navs.indexOf(nav) == 0) {
-                            await activityController.fetchActivities(
-                                query:
-                                    'DateFinger ge ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value.add(const Duration(days: 1)))}');
+                            activityController.query =
+                                'DateFinger ge ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value.add(const Duration(days: 1)))}';
                           } else if (navs.indexOf(nav) == 1) {
-                            await activityController.fetchActivities(
-                                query:
-                                    'DateFinger ge ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value.subtract(const Duration(days: 7)))} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)}');
+                            activityController.query =
+                                'DateFinger ge ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value.subtract(const Duration(days: 7)))} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)}';
                           } else if (navs.indexOf(nav) == 2) {
-                            await activityController.fetchActivities(
-                                query:
-                                    'DateFinger ge ${DateFormat('yyyy-MM-dd').format(DateTime(activityController.selectedDateValue.value.year, activityController.selectedDateValue.value.month - 1, 1))} and DateFinger le ${DateFormat('yyyy-MM-dd').format(activityController.selectedDateValue.value)}');
+                            activityController.query =
+                                'DateFinger ge ${DateFormat('yyyy-MM-dd').format(DateTime(activityController.selectedDateValue.value.year, activityController.selectedDateValue.value.month, 1))} and DateFinger le ${DateFormat('yyyy-MM-dd').format(DateTime(activityController.selectedDateValue.value.year, activityController.selectedDateValue.value.month + 1, 0))}';
                           }
+                          await activityController.fetchActivities(
+                              top: top, skip: skip, page: page);
                           setState(() {
-                            isLoading = false;
+                            activityController.isLoading.value = false;
                           });
                         },
                         child: Container(
@@ -326,19 +313,21 @@ class _ActivityFragmentState extends State<ActivityFragment>
                           onPressed: () async {
                             resetPage();
                             setState(() {
-                              isLoading = true;
+                              activityController.activities.clear();
+                              activityController.groupedActivities.clear();
+                              activityController.isLoading.value = true;
                             });
                             if (activityController.selectedNav.value == 0) {
-                              await activityController.prevDay();
+                              activityController.prevDay();
                             } else if (activityController.selectedNav.value ==
                                 1) {
-                              await activityController.prevWeek();
+                              activityController.prevWeek();
                             } else if (activityController.selectedNav.value ==
                                 2) {
-                              await activityController.prevMonth();
+                              activityController.prevMonth();
                             }
                             setState(() {
-                              isLoading = false;
+                              activityController.isLoading.value = false;
                             });
                           },
                           icon: const Icon(
@@ -374,7 +363,9 @@ class _ActivityFragmentState extends State<ActivityFragment>
                           onPressed: () async {
                             resetPage();
                             setState(() {
-                              isLoading = true;
+                              activityController.activities.clear();
+                              activityController.groupedActivities.clear();
+                              activityController.isLoading.value = true;
                             });
                             if (activityController.selectedNav.value == 0) {
                               await activityController.nextDay();
@@ -386,7 +377,7 @@ class _ActivityFragmentState extends State<ActivityFragment>
                               await activityController.nextMonth();
                             }
                             setState(() {
-                              isLoading = false;
+                              activityController.isLoading.value = false;
                             });
                           },
                           icon: const Icon(
@@ -437,17 +428,19 @@ class _ActivityFragmentState extends State<ActivityFragment>
                               },
                             ),
                     ),
-                    Visibility(
-                      visible: isLoading,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                        ),
-                        height: MediaQuery.of(context).size.height * 0.8,
-                        child: Center(
-                          child: LoadingAnimationWidget.staggeredDotsWave(
-                            color: appColorPrimary,
-                            size: 30,
+                    Obx(
+                      () => Visibility(
+                        visible: activityController.isLoading.value,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                          ),
+                          height: MediaQuery.of(context).size.height * 0.8,
+                          child: Center(
+                            child: LoadingAnimationWidget.staggeredDotsWave(
+                              color: appColorPrimary,
+                              size: 30,
+                            ),
                           ),
                         ),
                       ),
