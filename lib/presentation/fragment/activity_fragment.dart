@@ -36,14 +36,13 @@ class _ActivityFragmentState extends State<ActivityFragment>
   }
 
   void init() async {
-    await activityController.init();
-    activityController.activities.clear();
-    activityController.groupedActivities.clear();
-
-    await activityController.fetchActivities(
-      top: top,
-    );
-    activityController.isLoading.value = false;
+    // await activityController.init();
+    // activityController.activities.clear();
+    // activityController.groupedActivities.clear();
+    // await activityController.fetchActivities(
+    //   top: top,
+    // );
+    // activityController.isLoading.value = false;
   }
 
   void _scrollListener() async {

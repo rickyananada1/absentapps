@@ -12,8 +12,6 @@ import '../../presentation/screens/success_screen.dart';
 import '../../store/AppStore.dart';
 import '../../utils/app_theme.dart';
 
-final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-GlobalKey<NavigatorState>? navigatorKey = GlobalKey<NavigatorState>();
 AppStore appStore = AppStore();
 
 class App extends StatelessWidget {
@@ -26,8 +24,6 @@ class App extends StatelessWidget {
       theme: AppThemeData.lightTheme,
       // darkTheme: AppThemeData.darkTheme,
       // themeMode: appStore.isDarkModeOn.value ? ThemeMode.dark : ThemeMode.light,
-      scaffoldMessengerKey: scaffoldMessengerKey,
-      navigatorKey: navigatorKey,
       initialRoute: '/splash',
       getPages: [
         GetPage(name: '/splash', page: () => const SplashScreen()),

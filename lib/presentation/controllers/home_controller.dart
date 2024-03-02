@@ -29,9 +29,9 @@ class HomeController extends GetxController {
 
   Future<void> loadData() async {
     isLoading.value = true;
-    await authController.getProfile();
-    await authController.getCompanyProfile();
+    Future.wait([authController.getProfile()]);
     await getActivities();
+    await authController.getCompanyProfile();
     isLoading.value = false;
     dataFetched.value = true;
   }

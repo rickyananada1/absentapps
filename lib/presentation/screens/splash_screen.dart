@@ -35,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
           var user = await LocalDb()
               .getUser(getStringAsync('USER_ID', defaultValue: ''));
           if (user!.embeddings == null) {
-            Get.offAllNamed('/face_scan');
+            Get.offAllNamed('/dashboard');
           } else {
             Get.offAllNamed('/dashboard');
           }

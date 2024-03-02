@@ -38,6 +38,15 @@ class ActivityController extends GetxController {
     var user =
         await LocalDb().getUser(getStringAsync('USER_ID', defaultValue: ''));
     C_BPartner_ID = user!.C_BPartner_ID!.toString();
+    query =
+        'DateFinger ge ${DateFormat('yyyy-MM-01').format(selectedDateValue.value)} and DateFinger le ${DateFormat('yyyy-MM-01').format(Jiffy.parseFromDateTime(selectedDateValue.value).add(months: 1).dateTime)}';
+    activities.clear();
+    groupedActivities.clear();
+    await fetchActivities(
+      top: 10,
+      skip: 0,
+    );
+    isLoading.value = false;
   }
 
   Future<void> fetchActivities(

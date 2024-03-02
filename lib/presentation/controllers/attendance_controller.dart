@@ -105,12 +105,12 @@ class AttendanceController extends GetxController {
     currentLocation = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
 
-    // if (currentLocation.isMocked) {
-    //   Get.snackbar('Error', 'Fake location detected',
-    //       backgroundColor: Colors.red, colorText: Colors.white);
-    //   isLoading.value = false;
-    //   return;
-    // }
+    if (currentLocation.isMocked) {
+      Get.snackbar('Error', 'Fake location detected',
+          backgroundColor: Colors.red, colorText: Colors.white);
+      isLoading.value = false;
+      return;
+    }
 
     if (!inLocation.value) {
       Get.snackbar('Error', 'You are not in the working location',
