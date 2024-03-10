@@ -30,6 +30,8 @@ class AttendanceController extends GetxController {
   late RxBool inLocation;
   late Position currentLocation;
   late RxBool isLoading;
+  late String locationName = '';
+  double distanceInMeters = 0;
 
   @override
   void onInit() {
@@ -70,11 +72,6 @@ class AttendanceController extends GetxController {
     }
 
     await mlService.doFaceDetection(image.value!);
-    if (!homeController.authController.user.value!.IsAllowFingerfromAnywhere) {
-      inLocation.value = true;
-    } else {
-      await checkLocation();
-    }
 
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     LocationPermission permission = await Geolocator.checkPermission();
@@ -94,22 +91,29 @@ class AttendanceController extends GetxController {
       return;
     }
 
-    var useMask = await mlService.doMaskDetection();
-    if (useMask) {
-      Get.snackbar('Error', 'Please remove mask',
-          backgroundColor: Colors.red, colorText: Colors.white);
-      isLoading.value = false;
-      return;
-    }
+    // var useMask = await mlService.doMaskDetection();
+    // if (useMask) {
+    //   Get.snackbar('Error', 'Please remove mask',
+    //       backgroundColor: Colors.red, colorText: Colors.white);
+    //   isLoading.value = false;
+    //   return;
+    // }
 
     currentLocation = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
 
-    if (currentLocation.isMocked) {
-      Get.snackbar('Error', 'Fake location detected',
-          backgroundColor: Colors.red, colorText: Colors.white);
-      isLoading.value = false;
-      return;
+    // if (currentLocation.isMocked) {
+    //   Get.snackbar('Error', 'Fake location detected',
+    //       backgroundColor: Colors.red, colorText: Colors.white);
+    //   isLoading.value = false;
+    //   return;
+    // }
+
+    if (homeController.authController.user.value!.IsAllowFingerfromAnywhere) {
+      locationName = await getAddress(currentLocation);
+      inLocation.value = true;
+    } else {
+      await checkLocation();
     }
 
     if (!inLocation.value) {
@@ -139,6 +143,7 @@ class AttendanceController extends GetxController {
       currentLocation.longitude,
       5,
       homeController.fingerType.value,
+      locationName,
     );
 
     response.fold(
@@ -170,14 +175,17 @@ class AttendanceController extends GetxController {
   Future<void> checkLocation() async {
     inLocation.value = false;
     for (WorkingLocation location in workingLocations) {
-      double distanceInMeters = Geolocator.distanceBetween(
+      double currentDistanceInMeters = Geolocator.distanceBetween(
         currentLocation.latitude,
         currentLocation.longitude,
         location.Latitude!.toDouble(),
         location.Longitude!.toDouble(),
       );
 
-      if (distanceInMeters < location.Radius!) {
+      if (currentDistanceInMeters < location.Radius! &&
+          (currentDistanceInMeters < distanceInMeters)) {
+        distanceInMeters = currentDistanceInMeters;
+        locationName = location.Name!;
         inLocation.value = true;
         break;
       }
@@ -201,5 +209,20 @@ class AttendanceController extends GetxController {
           'Anda baru saja melakukan Presensi Pulang pada jam ${now.hour}:${now.minute} WIB';
     }
     return message;
+  }
+
+  Future<String> getAddress(Position position) async {
+    final response =
+        await _apiProvider.getAddress(position.latitude, position.longitude);
+    return response.fold(
+      (failure) {
+        Get.snackbar('Error', failure.message);
+        return '';
+      },
+      (data) {
+        // return data.historic!;
+        return data;
+      },
+    );
   }
 }

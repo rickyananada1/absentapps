@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
@@ -70,20 +69,13 @@ class ActivityController extends GetxController {
         );
       },
       (data) {
-        final List<Activity> fetchedActivities = [];
-        Future.wait(data.data['activities'].map<Future<void>>((item) async {
-          final location = await getLocation(
-              double.parse(item.Latitude!), double.parse(item.Longitude!));
-          fetchedActivities.add(item.copyWith(location: location));
-        })).then((value) {
-          if (page != null && page > 1) {
-            activities.addAll(fetchedActivities);
-          } else {
-            activities.assignAll(fetchedActivities);
-          }
-          hasMore.value = data.data['page-count'] > (page ?? 1);
-          groupedActivities.assignAll(groupActivitiesByDate(activities));
-        });
+        if (page != null && page > 1) {
+          activities.addAll(data.data['activities']);
+        } else {
+          activities.assignAll(data.data['activities']);
+        }
+        hasMore.value = data.data['page-count'] > (page ?? 1);
+        groupedActivities.assignAll(groupActivitiesByDate(activities));
       },
     );
   }
@@ -179,12 +171,6 @@ class ActivityController extends GetxController {
     }).toList();
 
     return groupedActivities;
-  }
-
-  Future<String> getLocation(double lat, double long) async {
-    List<Placemark> placemarks = await placemarkFromCoordinates(lat, long);
-    Placemark place = placemarks[0];
-    return '${place.street}';
   }
 }
 

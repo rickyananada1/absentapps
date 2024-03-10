@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
 
@@ -89,28 +91,38 @@ class ActivityComponent extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          DateFormat('HH:mm')
-                              .format(activities[index].DateFinger!),
-                          style: const TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold),
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            DateFormat('HH:mm')
+                                .format(activities[index].DateFinger!),
+                            style: const TextStyle(
+                                fontSize: 22, fontWeight: FontWeight.bold),
+                          ),
                         ),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.pin_drop,
-                              size: 18,
-                              color: Colors.red,
-                            ),
-                            10.width,
-                            Text(
-                              activities[index].location ?? 'Unknown',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
+                        Expanded(
+                          flex: 3,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              const Icon(
+                                Icons.pin_drop,
+                                size: 18,
+                                color: Colors.red,
                               ),
-                            ),
-                          ],
+                              10.width,
+                              Flexible(
+                                child: Text(
+                                  activities[index].Description ?? 'Unknown',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                         )
                       ],
                     ),

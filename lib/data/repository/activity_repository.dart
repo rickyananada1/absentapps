@@ -27,14 +27,20 @@ class ActivityRepository {
     return await _apiProvider.getWorkingLocations();
   }
 
+  Future<Either<Failure, String>> getAddress(
+      double latitude, double longitude) async {
+    return await _apiProvider.getAddress(latitude, longitude);
+  }
+
   Future<Either<Failure, Activity>> postAttendance(
       String partnerId,
       DateTime date,
       double latitude,
       double longitude,
       int distance,
-      String fingerType) async {
-    return await _apiProvider.postAttendance(
-        partnerId, date, latitude, longitude, distance, fingerType);
+      String fingerType,
+      String locationName) async {
+    return await _apiProvider.postAttendance(partnerId, date, latitude,
+        longitude, distance, fingerType, locationName);
   }
 }

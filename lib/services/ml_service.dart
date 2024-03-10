@@ -100,6 +100,7 @@ class MLService {
     List output = List.filled(1 * 192, 0).reshape([1, 192]);
     interpreter.run(input, output);
     interpreter.close();
+    log(List.from(output.reshape([192])).toString());
     return List.from(output.reshape([192]));
   }
 
@@ -167,7 +168,12 @@ class MLService {
     List output = List.filled(1 * 2, 0).reshape([1, 2]);
     interpreter.run(input, output);
     interpreter.close();
-    return output[0][0] > output[0][1];
+    final predictionResult = output[0] as List<double>;
+    if (predictionResult[0] > predictionResult[1]) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Future<File> removeRotation(File inputImage) async {

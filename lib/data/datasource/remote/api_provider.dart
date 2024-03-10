@@ -190,7 +190,7 @@ class ApiProvider {
 
     Map<String, dynamic> buildQuery = {
       '\$select':
-          'DateFinger,HR_Location_ID,Latitude,Longitude,Distance,FingerType',
+          'DateFinger,HR_Location_ID,Latitude,Longitude,Distance,FingerType,Description',
       '\$filter': query != null
           ? 'C_BPartner_ID eq $cBpartnerId and $query'
           : 'C_BPartner_ID eq $cBpartnerId',
@@ -248,6 +248,7 @@ class ApiProvider {
     double longitude,
     int distance,
     String fingerType,
+    String locationName,
   ) async {
     const path = Strings.postAttendanceEndpoint;
     Map<String, dynamic> data = {
@@ -260,10 +261,24 @@ class ApiProvider {
       'Longitude': longitude,
       'Distance': distance,
       'FingerType': fingerType,
+      'Description': locationName,
     };
     return await handleApiResponse(
       () => request.post(path, data: data),
       (data) => Activity.fromJson(data),
+    );
+  }
+
+  Future<Either<Failure, String>> getAddress(double lat, double long) async {
+    const path = Strings.getAddressEndpoint;
+    Map<String, dynamic> query = {
+      'lat': lat,
+      'lon': long,
+    };
+    return await handleApiResponse(
+      () => request.get(path, queryParameters: query),
+      // (data) => Address.fromJson(data['address']),
+      (data) => data['display_name'],
     );
   }
 }

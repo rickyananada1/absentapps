@@ -69,11 +69,57 @@ class _HomeFragmentState extends State<HomeFragment>
                     width: double.infinity,
                     child: FloatingActionButton.extended(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AttendanceScreen(),
-                          ),
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => const AttendanceScreen(),
+                        //   ),
+                        // );
+                        // show dialog,
+                        // silahkan lepaskan masker dan kacamata anda sebelum proses ini
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              backgroundColor: white,
+                              elevation: 0,
+                              title: const Text('Konfirmasi'),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // icon
+                                  const Icon(
+                                    FontAwesomeIcons.triangleExclamation,
+                                    color: Colors.red,
+                                    size: 40,
+                                  ),
+                                  10.height,
+                                  const Text(
+                                    'Silahkan lepaskan masker dan kacamata anda sebelum proses ini',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: black,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Get.back();
+                                  },
+                                  child: const Text('Batal'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Get.back();
+                                    Get.to(() => const AttendanceScreen());
+                                  },
+                                  child: const Text('Lanjut'),
+                                ),
+                              ],
+                            );
+                          },
                         );
                       },
                       icon: controller.fingerType.value == 'Out'

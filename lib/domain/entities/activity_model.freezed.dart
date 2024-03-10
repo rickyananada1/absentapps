@@ -26,8 +26,9 @@ mixin _$Activity {
   String? get Latitude => throw _privateConstructorUsedError;
   String? get Longitude => throw _privateConstructorUsedError;
   double? get Distance => throw _privateConstructorUsedError;
+  String? get Description => throw _privateConstructorUsedError;
   FingerTypeModel? get FingerType => throw _privateConstructorUsedError;
-  String? get location => throw _privateConstructorUsedError;
+  HR_Location_IDModel? get HR_Location_ID => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -47,10 +48,12 @@ abstract class $ActivityCopyWith<$Res> {
       String? Latitude,
       String? Longitude,
       double? Distance,
+      String? Description,
       FingerTypeModel? FingerType,
-      String? location});
+      HR_Location_IDModel? HR_Location_ID});
 
   $FingerTypeModelCopyWith<$Res>? get FingerType;
+  $HR_Location_IDModelCopyWith<$Res>? get HR_Location_ID;
 }
 
 /// @nodoc
@@ -72,8 +75,9 @@ class _$ActivityCopyWithImpl<$Res, $Val extends Activity>
     Object? Latitude = freezed,
     Object? Longitude = freezed,
     Object? Distance = freezed,
+    Object? Description = freezed,
     Object? FingerType = freezed,
-    Object? location = freezed,
+    Object? HR_Location_ID = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -100,14 +104,18 @@ class _$ActivityCopyWithImpl<$Res, $Val extends Activity>
           ? _value.Distance
           : Distance // ignore: cast_nullable_to_non_nullable
               as double?,
+      Description: freezed == Description
+          ? _value.Description
+          : Description // ignore: cast_nullable_to_non_nullable
+              as String?,
       FingerType: freezed == FingerType
           ? _value.FingerType
           : FingerType // ignore: cast_nullable_to_non_nullable
               as FingerTypeModel?,
-      location: freezed == location
-          ? _value.location
-          : location // ignore: cast_nullable_to_non_nullable
-              as String?,
+      HR_Location_ID: freezed == HR_Location_ID
+          ? _value.HR_Location_ID
+          : HR_Location_ID // ignore: cast_nullable_to_non_nullable
+              as HR_Location_IDModel?,
     ) as $Val);
   }
 
@@ -120,6 +128,18 @@ class _$ActivityCopyWithImpl<$Res, $Val extends Activity>
 
     return $FingerTypeModelCopyWith<$Res>(_value.FingerType!, (value) {
       return _then(_value.copyWith(FingerType: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $HR_Location_IDModelCopyWith<$Res>? get HR_Location_ID {
+    if (_value.HR_Location_ID == null) {
+      return null;
+    }
+
+    return $HR_Location_IDModelCopyWith<$Res>(_value.HR_Location_ID!, (value) {
+      return _then(_value.copyWith(HR_Location_ID: value) as $Val);
     });
   }
 }
@@ -139,11 +159,14 @@ abstract class _$$ActivityImplCopyWith<$Res>
       String? Latitude,
       String? Longitude,
       double? Distance,
+      String? Description,
       FingerTypeModel? FingerType,
-      String? location});
+      HR_Location_IDModel? HR_Location_ID});
 
   @override
   $FingerTypeModelCopyWith<$Res>? get FingerType;
+  @override
+  $HR_Location_IDModelCopyWith<$Res>? get HR_Location_ID;
 }
 
 /// @nodoc
@@ -163,8 +186,9 @@ class __$$ActivityImplCopyWithImpl<$Res>
     Object? Latitude = freezed,
     Object? Longitude = freezed,
     Object? Distance = freezed,
+    Object? Description = freezed,
     Object? FingerType = freezed,
-    Object? location = freezed,
+    Object? HR_Location_ID = freezed,
   }) {
     return _then(_$ActivityImpl(
       id: freezed == id
@@ -191,14 +215,18 @@ class __$$ActivityImplCopyWithImpl<$Res>
           ? _value.Distance
           : Distance // ignore: cast_nullable_to_non_nullable
               as double?,
+      Description: freezed == Description
+          ? _value.Description
+          : Description // ignore: cast_nullable_to_non_nullable
+              as String?,
       FingerType: freezed == FingerType
           ? _value.FingerType
           : FingerType // ignore: cast_nullable_to_non_nullable
               as FingerTypeModel?,
-      location: freezed == location
-          ? _value.location
-          : location // ignore: cast_nullable_to_non_nullable
-              as String?,
+      HR_Location_ID: freezed == HR_Location_ID
+          ? _value.HR_Location_ID
+          : HR_Location_ID // ignore: cast_nullable_to_non_nullable
+              as HR_Location_IDModel?,
     ));
   }
 }
@@ -213,8 +241,9 @@ class _$ActivityImpl implements _Activity {
       required this.Latitude,
       required this.Longitude,
       required this.Distance,
+      required this.Description,
       required this.FingerType,
-      required this.location});
+      required this.HR_Location_ID});
 
   factory _$ActivityImpl.fromJson(Map<String, dynamic> json) =>
       _$$ActivityImplFromJson(json);
@@ -232,13 +261,15 @@ class _$ActivityImpl implements _Activity {
   @override
   final double? Distance;
   @override
+  final String? Description;
+  @override
   final FingerTypeModel? FingerType;
   @override
-  final String? location;
+  final HR_Location_IDModel? HR_Location_ID;
 
   @override
   String toString() {
-    return 'Activity(id: $id, uid: $uid, DateFinger: $DateFinger, Latitude: $Latitude, Longitude: $Longitude, Distance: $Distance, FingerType: $FingerType, location: $location)';
+    return 'Activity(id: $id, uid: $uid, DateFinger: $DateFinger, Latitude: $Latitude, Longitude: $Longitude, Distance: $Distance, Description: $Description, FingerType: $FingerType, HR_Location_ID: $HR_Location_ID)';
   }
 
   @override
@@ -256,16 +287,18 @@ class _$ActivityImpl implements _Activity {
                 other.Longitude == Longitude) &&
             (identical(other.Distance, Distance) ||
                 other.Distance == Distance) &&
+            (identical(other.Description, Description) ||
+                other.Description == Description) &&
             (identical(other.FingerType, FingerType) ||
                 other.FingerType == FingerType) &&
-            (identical(other.location, location) ||
-                other.location == location));
+            (identical(other.HR_Location_ID, HR_Location_ID) ||
+                other.HR_Location_ID == HR_Location_ID));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, id, uid, DateFinger, Latitude,
-      Longitude, Distance, FingerType, location);
+      Longitude, Distance, Description, FingerType, HR_Location_ID);
 
   @JsonKey(ignore: true)
   @override
@@ -289,8 +322,9 @@ abstract class _Activity implements Activity {
       required final String? Latitude,
       required final String? Longitude,
       required final double? Distance,
+      required final String? Description,
       required final FingerTypeModel? FingerType,
-      required final String? location}) = _$ActivityImpl;
+      required final HR_Location_IDModel? HR_Location_ID}) = _$ActivityImpl;
 
   factory _Activity.fromJson(Map<String, dynamic> json) =
       _$ActivityImpl.fromJson;
@@ -308,9 +342,11 @@ abstract class _Activity implements Activity {
   @override
   double? get Distance;
   @override
+  String? get Description;
+  @override
   FingerTypeModel? get FingerType;
   @override
-  String? get location;
+  HR_Location_IDModel? get HR_Location_ID;
   @override
   @JsonKey(ignore: true)
   _$$ActivityImplCopyWith<_$ActivityImpl> get copyWith =>
