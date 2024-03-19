@@ -92,14 +92,6 @@ class AttendanceController extends GetxController {
       return;
     }
 
-    // var useMask = await mlService.doMaskDetection();
-    // if (useMask) {
-    //   Get.snackbar('Error', 'Please remove mask',
-    //       backgroundColor: Colors.red, colorText: Colors.white);
-    //   isLoading.value = false;
-    //   return;
-    // }
-
     currentLocation = await Geolocator.getCurrentPosition();
 
     // if (currentLocation.isMocked) {
