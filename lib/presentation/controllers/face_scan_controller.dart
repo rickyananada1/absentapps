@@ -121,7 +121,7 @@ class FaceScanController extends GetxController {
                   String bytes = base64Encode(img.encodeJpg(cropedFace));
                   isLoading.value = true;
                   Get.back();
-                  await authController.postImages(bytes, user);
+                  await authController.putBiometric(embeddings, bytes, user);
                   isLoading.value = false;
                 },
                 style: ElevatedButton.styleFrom(

@@ -21,6 +21,7 @@ abstract class UserModel with _$UserModel {
     required String? model_name,
     required List<double>? embeddings,
     required double? distance,
+    required List<double>? biometric,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>

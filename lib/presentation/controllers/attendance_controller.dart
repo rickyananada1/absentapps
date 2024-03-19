@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:developer' as log;
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -99,8 +100,7 @@ class AttendanceController extends GetxController {
     //   return;
     // }
 
-    currentLocation = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+    currentLocation = await Geolocator.getCurrentPosition();
 
     // if (currentLocation.isMocked) {
     //   Get.snackbar('Error', 'Fake location detected',
@@ -174,19 +174,23 @@ class AttendanceController extends GetxController {
 
   Future<void> checkLocation() async {
     inLocation.value = false;
+
     for (WorkingLocation location in workingLocations) {
       double currentDistanceInMeters = Geolocator.distanceBetween(
         currentLocation.latitude,
         currentLocation.longitude,
-        location.Latitude!.toDouble(),
-        location.Longitude!.toDouble(),
+        location.Latitude!.substring(0, 9).toDouble(),
+        location.Longitude!.substring(0, 9).toDouble(),
       );
 
-      if (currentDistanceInMeters < location.Radius! &&
-          (currentDistanceInMeters < distanceInMeters)) {
-        distanceInMeters = currentDistanceInMeters;
-        locationName = location.Name!;
+      log.log('Location: ${location.Name}');
+      log.log('Distance: $currentDistanceInMeters');
+      log.log('Radius: ${location.Radius}');
+
+      if (currentDistanceInMeters <= (location.Radius! + 50)) {
         inLocation.value = true;
+        locationName = location.Name!;
+        distanceInMeters = currentDistanceInMeters;
         break;
       }
     }

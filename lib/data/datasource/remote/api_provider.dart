@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
@@ -38,9 +39,11 @@ class ApiProvider {
       if (response.statusCode == 401) {
         return Left(Failure(response.statusCode!, 'Unauthorized'));
       }
-      // handle if response is not json
-      if (response.data is String) {
-        return Left(Failure(response.statusCode!, 'Response is not JSON'));
+      if (response.statusCode == 403) {
+        return Left(Failure(response.statusCode!, 'Forbidden'));
+      }
+      if (response.statusCode == 404) {
+        return Left(Failure(response.statusCode!, 'Not found'));
       }
       if (response.data.containsKey('status') &&
           response.data['status'] == 'error') {
@@ -117,11 +120,19 @@ class ApiProvider {
     var path = '${Strings.profileEndpoint}$userId';
     Map<String, dynamic> query = {
       'select':
-          'NIP,EmployeeName,DoH,Office,Department,Position,C_BPartner_ID,IsAllowFingerfromAnywhere',
+          'NIP,EmployeeName,DoH,Office,Department,Position,C_BPartner_ID,IsAllowFingerfromAnywhere,Biometric',
     };
     return await handleApiResponse(
       () => request.get(path, queryParameters: query),
-      (data) => UserModel.fromJson(data),
+      (data) {
+        // check if data contains biometric
+        if (data.containsKey('Biometric')) {
+          // if biometric is not null, decode it
+          data['Biometric'] = jsonDecode(data['Biometric']);
+        }
+        return UserModel.fromJson(data);
+      },
+      // (data) => UserModel.fromJson(data),
     );
   }
 
@@ -154,19 +165,18 @@ class ApiProvider {
     });
   }
 
-  Future<Either<Failure, Response>> postImages(
-      String name, String description, String image) async {
-    const path = Strings.postImagesEndpoint;
+  Future<Either<Failure, Response>> putBiometric(List<double> biometric,
+      String name, String image, String C_BPartner_ID) async {
+    var path = Strings.putBiometricEndpoint + C_BPartner_ID;
     Map<String, dynamic> data = {
-      'IsActive': true,
-      'Name': name,
-      'BinaryData': image,
-      'ImageURL': name,
-      'Description': description,
-      'EntityType': 'U',
+      'Biometric': jsonEncode(biometric),
+      'AD_Image_ID': {
+        'filename': name,
+        'data': image,
+      }
     };
     return await handleApiResponse(
-      () => request.post(path, data: data),
+      () => request.put(path, data: data),
       (data) => Response(
         requestOptions: RequestOptions(
           path: path,
@@ -277,7 +287,6 @@ class ApiProvider {
     };
     return await handleApiResponse(
       () => request.get(path, queryParameters: query),
-      // (data) => Address.fromJson(data['address']),
       (data) => data['display_name'],
     );
   }

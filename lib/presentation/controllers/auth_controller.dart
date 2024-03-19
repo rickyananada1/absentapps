@@ -80,9 +80,19 @@ class AuthController extends GetxController {
     String userId = getStringAsync('USER_ID', defaultValue: '');
     final response = await _authrepository.getProfile(userId);
     response.fold(
-      (failure) async {
-        if (failure.code == 401) {
-          await logout();
+      (failure) {
+        Get.defaultDialog(
+          title: 'Error',
+          content: Text(failure.message),
+          textConfirm: 'OK',
+          confirmTextColor: Colors.white,
+          onConfirm: () => Get.back(),
+        );
+        if (failure.code == 401 ||
+            failure.code == 403 ||
+            failure.code == 404 ||
+            failure.code == 500) {
+          logout();
         }
       },
       (data) async {
@@ -115,11 +125,12 @@ class AuthController extends GetxController {
     Get.offAllNamed('/login');
   }
 
-  Future<void> postImages(String image, User user) async {
+  Future<void> putBiometric(
+      List<double> biometrics, String image, User user) async {
     isLoading.value = true;
     var name = '${user.NIP}.jpg';
-    var description = 'Face Image of ${user.NIP}';
-    final response = await _authrepository.postImages(name, description, image);
+    final response = await _authrepository.putBiometric(
+        biometrics, name, image, user.C_BPartner_ID!);
     isLoading.value = false;
     response.fold(
       (failure) async {

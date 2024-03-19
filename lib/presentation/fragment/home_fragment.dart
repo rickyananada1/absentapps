@@ -69,14 +69,6 @@ class _HomeFragmentState extends State<HomeFragment>
                     width: double.infinity,
                     child: FloatingActionButton.extended(
                       onPressed: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => const AttendanceScreen(),
-                        //   ),
-                        // );
-                        // show dialog,
-                        // silahkan lepaskan masker dan kacamata anda sebelum proses ini
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
@@ -103,7 +95,7 @@ class _HomeFragmentState extends State<HomeFragment>
                                   ),
                                 ],
                               ),
-                              actions: <Widget>[
+                              actions: [
                                 TextButton(
                                   onPressed: () {
                                     Get.back();
@@ -196,35 +188,23 @@ class _HomeFragmentState extends State<HomeFragment>
                                               ),
                                         10.width,
                                         Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                          child: Row(
                                             children: [
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    controller.authController
-                                                        .client.value!.name,
-                                                    style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 20,
-                                                    ),
-                                                    maxLines: null,
-                                                  ),
-                                                  const SizedBox(width: 5),
-                                                  Icon(
-                                                      FontAwesomeIcons
-                                                          .arrowUpRightFromSquare,
-                                                      color: Colors.grey[700],
-                                                      size: 16),
-                                                ],
-                                              ),
-                                              const Text(
-                                                'Jika kamu merasa gagal gagal di hari ini, coba lagi besok!',
-                                                style: TextStyle(fontSize: 14),
+                                              Text(
+                                                controller.authController.client
+                                                    .value!.name,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 20,
+                                                ),
                                                 maxLines: null,
                                               ),
+                                              const SizedBox(width: 5),
+                                              Icon(
+                                                  FontAwesomeIcons
+                                                      .arrowUpRightFromSquare,
+                                                  color: Colors.grey[700],
+                                                  size: 16),
                                             ],
                                           ),
                                         )
@@ -420,8 +400,8 @@ class _HomeFragmentState extends State<HomeFragment>
                                           controller.lastActivity!.FingerType!
                                                       .identifier ==
                                                   'In'
-                                              ? 'Presensi Masuk'
-                                              : 'Presensi Keluar',
+                                              ? 'Masuk'
+                                              : 'Keluar',
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 14,

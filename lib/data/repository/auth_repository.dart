@@ -23,8 +23,9 @@ class AuthRepository {
     return await _apiProvider.getCompanyProfile();
   }
 
-  Future<Either<Failure, Response>> postImages(
-      String name, String description, String image) async {
-    return await _apiProvider.postImages(name, description, image);
+  Future<Either<Failure, Response>> putBiometric(List<double> biometric,
+      String name, String image, String C_BPartner_ID) async {
+    return await _apiProvider.putBiometric(
+        biometric, name, image, C_BPartner_ID);
   }
 }
