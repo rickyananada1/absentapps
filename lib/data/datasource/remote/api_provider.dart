@@ -127,12 +127,14 @@ class ApiProvider {
       (data) {
         // check if data contains biometric
         if (data.containsKey('Biometric')) {
-          // if biometric is not null, decode it
-          data['Biometric'] = jsonDecode(data['Biometric']);
+          if (data['Biometric'] != null) {
+            data['Biometric'] = jsonDecode(data['Biometric']);
+          } else {
+            data['Biometric'] = [];
+          }
         }
         return UserModel.fromJson(data);
       },
-      // (data) => UserModel.fromJson(data),
     );
   }
 

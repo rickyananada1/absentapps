@@ -104,9 +104,9 @@ class MLService {
     return List.from(output.reshape([192]));
   }
 
-  Future<bool> compareFaces(img.Image capturedImage) async {
+  Future<bool> compareFaces(
+      img.Image capturedImage, List<double> userEmbeddings) async {
     List<double> embeddings = getEmbeddings(capturedImage);
-    List<double> userEmbeddings = user!.embeddings!;
     double distance = euclideanDistance(embeddings, userEmbeddings);
     double threshold = 1.0;
     if (distance <= threshold) {

@@ -27,7 +27,7 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
           ?.map((e) => (e as num).toDouble())
           .toList(),
       distance: (json['distance'] as num?)?.toDouble(),
-      biometric: (json['biometric'] as List<dynamic>?)
+      Biometric: (json['Biometric'] as List<dynamic>?)
           ?.map((e) => (e as num).toDouble())
           .toList(),
     );
@@ -47,5 +47,5 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'model_name': instance.model_name,
       'embeddings': instance.embeddings,
       'distance': instance.distance,
-      'biometric': instance.biometric,
+      'Biometric': instance.Biometric,
     };

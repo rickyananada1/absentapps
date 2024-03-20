@@ -60,16 +60,15 @@ class AuthController extends GetxController {
             User(
               NIP: user.value!.NIP,
               EmployeeName: user.value!.EmployeeName,
-              embeddings: null,
+              embeddings: user.value!.Biometric,
               C_BPartner_ID: user.value!.C_BPartner_ID!.id.toString(),
             ),
             getStringAsync('USER_ID', defaultValue: ''),
           );
-          Get.offNamed('/face_register');
-        } else if (userExists.embeddings == null) {
-          Get.offNamed('/face_register');
-        } else {
+        } else if (user.value!.Biometric != null) {
           Get.offNamed('/dashboard');
+        } else {
+          Get.offNamed('/face_register');
         }
       },
     );

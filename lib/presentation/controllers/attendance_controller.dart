@@ -116,7 +116,8 @@ class AttendanceController extends GetxController {
     }
 
     await mlService.loadModel();
-    bool isMatched = await mlService.compareFaces(mlService.cropedFace!);
+    bool isMatched = await mlService.compareFaces(mlService.cropedFace!,
+        homeController.authController.user.value!.embeddings!);
 
     if (!isMatched) {
       Get.snackbar('Error', 'Face not matched',
@@ -171,15 +172,15 @@ class AttendanceController extends GetxController {
       double currentDistanceInMeters = Geolocator.distanceBetween(
         currentLocation.latitude,
         currentLocation.longitude,
-        location.Latitude!.substring(0, 9).toDouble(),
-        location.Longitude!.substring(0, 9).toDouble(),
+        location.Latitude!.toDouble(),
+        location.Longitude!.toDouble(),
       );
 
       log.log('Location: ${location.Name}');
       log.log('Distance: $currentDistanceInMeters');
       log.log('Radius: ${location.Radius}');
 
-      if (currentDistanceInMeters <= (location.Radius! + 50)) {
+      if (currentDistanceInMeters <= (location.Radius! + 100)) {
         inLocation.value = true;
         locationName = location.Name!;
         distanceInMeters = currentDistanceInMeters;

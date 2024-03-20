@@ -33,7 +33,7 @@ mixin _$UserModel {
   String? get model_name => throw _privateConstructorUsedError;
   List<double>? get embeddings => throw _privateConstructorUsedError;
   double? get distance => throw _privateConstructorUsedError;
-  List<double>? get biometric => throw _privateConstructorUsedError;
+  List<double>? get Biometric => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -60,7 +60,7 @@ abstract class $UserModelCopyWith<$Res> {
       String? model_name,
       List<double>? embeddings,
       double? distance,
-      List<double>? biometric});
+      List<double>? Biometric});
 
   $C_BPartner_IDModelCopyWith<$Res>? get C_BPartner_ID;
 }
@@ -91,7 +91,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? model_name = freezed,
     Object? embeddings = freezed,
     Object? distance = freezed,
-    Object? biometric = freezed,
+    Object? Biometric = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -146,9 +146,9 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.distance
           : distance // ignore: cast_nullable_to_non_nullable
               as double?,
-      biometric: freezed == biometric
-          ? _value.biometric
-          : biometric // ignore: cast_nullable_to_non_nullable
+      Biometric: freezed == Biometric
+          ? _value.Biometric
+          : Biometric // ignore: cast_nullable_to_non_nullable
               as List<double>?,
     ) as $Val);
   }
@@ -188,7 +188,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
       String? model_name,
       List<double>? embeddings,
       double? distance,
-      List<double>? biometric});
+      List<double>? Biometric});
 
   @override
   $C_BPartner_IDModelCopyWith<$Res>? get C_BPartner_ID;
@@ -218,7 +218,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? model_name = freezed,
     Object? embeddings = freezed,
     Object? distance = freezed,
-    Object? biometric = freezed,
+    Object? Biometric = freezed,
   }) {
     return _then(_$UserModelImpl(
       id: freezed == id
@@ -273,9 +273,9 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.distance
           : distance // ignore: cast_nullable_to_non_nullable
               as double?,
-      biometric: freezed == biometric
-          ? _value._biometric
-          : biometric // ignore: cast_nullable_to_non_nullable
+      Biometric: freezed == Biometric
+          ? _value._Biometric
+          : Biometric // ignore: cast_nullable_to_non_nullable
               as List<double>?,
     ));
   }
@@ -298,9 +298,9 @@ class _$UserModelImpl implements _UserModel {
       required this.model_name,
       required final List<double>? embeddings,
       required this.distance,
-      required final List<double>? biometric})
+      required final List<double>? Biometric})
       : _embeddings = embeddings,
-        _biometric = biometric;
+        _Biometric = Biometric;
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserModelImplFromJson(json);
@@ -340,19 +340,19 @@ class _$UserModelImpl implements _UserModel {
 
   @override
   final double? distance;
-  final List<double>? _biometric;
+  final List<double>? _Biometric;
   @override
-  List<double>? get biometric {
-    final value = _biometric;
+  List<double>? get Biometric {
+    final value = _Biometric;
     if (value == null) return null;
-    if (_biometric is EqualUnmodifiableListView) return _biometric;
+    if (_Biometric is EqualUnmodifiableListView) return _Biometric;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(value);
   }
 
   @override
   String toString() {
-    return 'UserModel(id: $id, uid: $uid, C_BPartner_ID: $C_BPartner_ID, NIP: $NIP, EmployeeName: $EmployeeName, DoH: $DoH, Office: $Office, Department: $Department, Position: $Position, IsAllowFingerfromAnywhere: $IsAllowFingerfromAnywhere, model_name: $model_name, embeddings: $embeddings, distance: $distance, biometric: $biometric)';
+    return 'UserModel(id: $id, uid: $uid, C_BPartner_ID: $C_BPartner_ID, NIP: $NIP, EmployeeName: $EmployeeName, DoH: $DoH, Office: $Office, Department: $Department, Position: $Position, IsAllowFingerfromAnywhere: $IsAllowFingerfromAnywhere, model_name: $model_name, embeddings: $embeddings, distance: $distance, Biometric: $Biometric)';
   }
 
   @override
@@ -383,7 +383,7 @@ class _$UserModelImpl implements _UserModel {
             (identical(other.distance, distance) ||
                 other.distance == distance) &&
             const DeepCollectionEquality()
-                .equals(other._biometric, _biometric));
+                .equals(other._Biometric, _Biometric));
   }
 
   @JsonKey(ignore: true)
@@ -403,7 +403,7 @@ class _$UserModelImpl implements _UserModel {
       model_name,
       const DeepCollectionEquality().hash(_embeddings),
       distance,
-      const DeepCollectionEquality().hash(_biometric));
+      const DeepCollectionEquality().hash(_Biometric));
 
   @JsonKey(ignore: true)
   @override
@@ -434,7 +434,7 @@ abstract class _UserModel implements UserModel {
       required final String? model_name,
       required final List<double>? embeddings,
       required final double? distance,
-      required final List<double>? biometric}) = _$UserModelImpl;
+      required final List<double>? Biometric}) = _$UserModelImpl;
 
   factory _UserModel.fromJson(Map<String, dynamic> json) =
       _$UserModelImpl.fromJson;
@@ -466,7 +466,7 @@ abstract class _UserModel implements UserModel {
   @override
   double? get distance;
   @override
-  List<double>? get biometric;
+  List<double>? get Biometric;
   @override
   @JsonKey(ignore: true)
   _$$UserModelImplCopyWith<_$UserModelImpl> get copyWith =>
